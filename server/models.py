@@ -1,14 +1,14 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy import MetaData
-from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy.ext.hybrid import hybrid_property
 
 metadata = MetaData(naming_convention={
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
 })
 
 db = SQLAlchemy(metadata=metadata)
-    
+
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
 
@@ -16,17 +16,33 @@ class User(db.Model, SerializerMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     first_name = db.Column(db.String, nullable=False)
     last_name = db.Column(db.String, nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
+    _password_hash = db.Column(db.String(128), nullable=False)
     role = db.Column(db.String(20), nullable=False, default='Donor')  # Roles: 'donor', 'organization', 'administrator'
-
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
     
     def __repr__(self):
         return f'<User: Id: {self.id}, Name: {self.first_name} {self.last_name}>'
 
+    # this is a special property decorator for sqlalchemy
+    # it leaves all of the sqlalchemy characteristics of the column in place
+    @hybrid_property
+    def password_hash(self):
+        return self._password_hash
+
+    # setter method for the password property
+    @password_hash.setter
+    def password_hash(self, password):
+        self._password_hash = self.simple_hash(password)
+
+    # authentication method using user and password
+    def authenticate(self, password):
+        return self.simple_hash(password) == self._password_hash
+
+    # simple_hash requires no access to the class or instance
+    # let's leave it static
+    @staticmethod
+    def simple_hash(input):
+        return sum(bytearray(input, encoding='utf-8'))
+    
 class Organization(db.Model, SerializerMixin):
     __tablename__ = 'organizations'
 
