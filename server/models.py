@@ -47,7 +47,7 @@ class Donation(db.Model, SerializerMixin):
     donor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     anonymous = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
 
     def __repr__(self):
         return f'<Donation: Id: {self.id}, Amount: {self.amount} Donated At:{self.created_at}>'
@@ -59,7 +59,7 @@ class Story(db.Model, SerializerMixin):
     title = db.Column(db.String(120), nullable=False)
     content = db.Column(db.Text, nullable=False)
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
 
     def __repr__(self):
         return f'<Story: Id: {self.id}, Title: {self.title} Created At:{self.created_at}>'
