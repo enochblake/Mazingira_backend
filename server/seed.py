@@ -8,7 +8,7 @@ with app.app_context():
     Donation.query.delete()
     Story.query.delete()
 
-    admin = User(email="admin@mazingira.com", first_name="Jay",last_name="Kimani", password_hash="admin")
+    admin = User(email="admin@mazingira.com", first_name="Jay",last_name="Kimani", password_hash="admin", role="admin")
     donor = User(email="user@mazingira.com", first_name="Priscilla",last_name="Wakahia", password_hash="user")
     organization = Organization(name="Red Cross", image_url="werere", description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ac nunc vel justo ullamcorper malesuada. Quisque euismod sapien sit amet nulla efficitur, sed sollicitudin dolor fringilla. Integer euismod turpis nec eros ultricies, sit amet tempus diam laoreet. Vivamus id felis auctor, aliquet ante ac, congue libero. Nulla facilisi. Phasellus nec nisi at libero facilisis condimentum. Sed vestibulum justo nec risus fermentum, id feugiat turpis convallis. Aenean nec mauris nec justo pharetra ultricies. Nullam nec neque sit amet mauris ultricies accumsan. Suspendisse potenti. Sed nec libero id est varius facilisis.")
     donation = Donation(amount=230, donor_id=1, organization_id=1)
