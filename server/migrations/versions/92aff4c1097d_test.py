@@ -1,8 +1,8 @@
-"""initial migration
+"""test
 
-Revision ID: 269000492636
+Revision ID: 92aff4c1097d
 Revises: 
-Create Date: 2024-05-08 17:14:01.851365
+Create Date: 2024-05-09 13:37:53.235469
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '269000492636'
+revision = '92aff4c1097d'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,7 +22,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=120), nullable=False),
     sa.Column('image_url', sa.String(length=255), nullable=False),
-    sa.Column('approved', sa.Boolean(), nullable=True),
+    sa.Column('approval_status', sa.Boolean(), nullable=True),
     sa.Column('description', sa.String(length=255), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
@@ -39,7 +39,7 @@ def upgrade():
     op.create_table('donations',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('amount', sa.Float(), nullable=False),
-    sa.Column('donor_id', sa.Integer(), nullable=False),
+    sa.Column('donor_id', sa.Integer(), nullable=True),
     sa.Column('organization_id', sa.Integer(), nullable=False),
     sa.Column('anonymous', sa.Boolean(), nullable=True),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
