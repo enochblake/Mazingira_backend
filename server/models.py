@@ -15,11 +15,11 @@ class User(db.Model, SerializerMixin):
     serialize_rules = ('-donations.user',)
 
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
+    email = db.Column(db.String, unique=True, nullable=False)
     first_name = db.Column(db.String, nullable=False)
     last_name = db.Column(db.String, nullable=False)
-    _password_hash = db.Column(db.String(128), nullable=False)
-    role = db.Column(db.String(20), nullable=False, default='donor')  # Roles: 'donor', 'admin'
+    _password_hash = db.Column(db.String, nullable=False)
+    role = db.Column(db.String, nullable=False, default='donor')  # Roles: 'donor', 'admin'
 
     donations = db.relationship('Donation', backref='user')
 # Association proxy
@@ -54,12 +54,12 @@ class Organization(db.Model, SerializerMixin):
     serialize_rules = ('-donations.organization',)
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    image_url = db.Column(db.String(255), nullable=False)
+    name = db.Column(db.String, nullable=False)
+    email = db.Column(db.String, unique=True, nullable=False)
+    image_url = db.Column(db.String, nullable=False)
     approval_status = db.Column(db.Boolean, default=False)
-    description = db.Column(db.String(255), nullable=False)
-    _password_hash = db.Column(db.String(128), nullable=False)
+    description = db.Column(db.String, nullable=False)
+    _password_hash = db.Column(db.String, nullable=False)
 
     donations = db.relationship('Donation', backref='organization')
     stories = db.relationship('Story', backref='organization')
@@ -108,8 +108,9 @@ class Story(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(120), nullable=False)
     content = db.Column(db.Text, nullable=False)
-    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
+    image_url = db.Column(db.String, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
 
     def __repr__(self):
         return f'<Story: Id: {self.id}, Title: {self.title} Created At:{self.created_at}>'
