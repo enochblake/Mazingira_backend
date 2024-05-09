@@ -82,6 +82,7 @@ def register():
 
     return jsonify({'message': 'User registered successfully'}), 201
 
+
 # User Login
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -100,7 +101,10 @@ def login():
     # Generate JWT token
     token = jwt.encode({'user_id': user.id, 'role': user.role, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)}, app.config['SECRET_KEY'])
 
-    return jsonify({'token': token.decode('UTF-8')}), 200
+    print("Generated token:", token)  # Add this line for debugging
+
+    return jsonify({'token': token}), 200
+
 
 # Authentication Middleware
 def token_required(f):
@@ -152,7 +156,12 @@ def donate(current_user):
 
     return jsonify({'message': 'Donation successful'}), 201
 
+# if __name__ == '__main__':
+#     db.create_all()
+#     app.run(debug=True)
 if __name__ == '__main__':
-    db.create_all()
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
+
 
