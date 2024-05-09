@@ -1,4 +1,4 @@
-from flask import Flask, make_response, jsonify
+from flask import Flask, make_response, jsonify, request
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_restful import Api, Resource
@@ -28,7 +28,7 @@ api = Api(app)
 def index():
     return '<h1>Welcome To Mazingira</h1>'
 
-class AdminDashboard(Resource):
+class AdminOrganizations(Resource):
     def get(self):
         try:
             orgs = []
@@ -47,18 +47,56 @@ class AdminDashboard(Resource):
                 return make_response(jsonify({'message': 'No Organizations Found'}), 404)
         except Exception as e:
             return make_response(jsonify({'message': 'An error occurred', 'error': str(e)}), 500)
-    # def delete(self, id):
-    #     organization = organization = Organization.query.filter_by(id=id).first()
-    #     if organization:
-    #         db.session.delete(organization)
-    #         db.session.commit()
-    #         return {'message': 'Organization deleted successfully'}, 200
-    #     else:
-    #         return {'message': 'Organization not found'}, 404
+        
+class AdminOrganizationByID(Resource):
+
+    # View One Organization as the Admin
+    def get(self, id):
+        organization = Organization.query.filter(Organization.id == id).first()
+        if organization is None:
+            return make_response(jsonify({'message': 'The requested Organization does not exist'}), 404)
+        else:
+            return make_response(jsonify({
+                'id': organization.id,
+                'name': organization.name,
+                'email': organization.email,
+                'image_url': organization.image_url,
+                'approval_status': organization.approval_status,
+                'description': organization.description,
+            }), 200)
+        
+    def patch(self, id):
+        # Approve/Update an existing Organization
+        
+        organization = Organization.query.filter(Organization.id == id).first()
+        if not organization:
+            return {'message': 'Organization not found'}, 404
+
+        for attr in request.json:
+            setattr(organization, attr, request.json[attr])
+
+        db.session.commit()
+        return {'message': 'Organization Updated Successfully', 'organization': {
+            'id': organization.id,
+            'name': organization.name,
+            'email': organization.email,
+            'image_url': organization.image_url,
+            'approval_status': organization.approval_status,
+            'description': organization.description,
+        }}, 200
+    
+    def delete(self, id):
+        organization = Organization.query.filter_by(id=id).first()
+        if organization:
+            db.session.delete(organization)
+            db.session.commit()
+            return {'message': 'Organization deleted successfully'}, 200
+        else:
+            return {'message': 'Organization not found'}, 404
 
 # EndPoints
-api.add_resource(AdminDashboard, '/admin', endpoint='admin')
-# api.add_resource(AdminDashboard, '/admin/<int:id>', endpoint='admin')
+api.add_resource(AdminOrganizations, '/admin', endpoint='admin_organizations')
+api.add_resource(AdminOrganizationByID, '/admin/<int:id>', endpoint='admin_organizations_by_id')
 
 
 if __name__ == '__main__':

@@ -110,7 +110,7 @@ class Story(db.Model, SerializerMixin):
     content = db.Column(db.Text, nullable=False)
     image_url = db.Column(db.String, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
-    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
 
     def __repr__(self):
         return f'<Story: Id: {self.id}, Title: {self.title} Created At:{self.created_at}>'

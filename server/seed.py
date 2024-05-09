@@ -42,8 +42,7 @@ with app.app_context():
 
     # Populate Story Table
     for x in range(40):
-        story = Story(title=fake.name(), content=fake.paragraph(nb_sentences=6), organization_id=fake.random_int(min=1, max=10))
+        story = Story(title=fake.name(), content=fake.paragraph(nb_sentences=6),image_url="https://pbs.twimg.com/media/FpmD9sMXEAA4Mb7.jpg", organization_id=fake.random_int(min=1, max=10))
         db.session.add(story)
         db.session.commit()
     print('Story Created')
-    #  image_url="https://pbs.twimg.com/media/FpmD9sMXEAA4Mb7.jpg"
