@@ -1,8 +1,8 @@
-"""test
+"""empty message
 
-Revision ID: 92aff4c1097d
+Revision ID: c0cbefcc9625
 Revises: 
-Create Date: 2024-05-09 13:37:53.235469
+Create Date: 2024-05-09 18:16:13.418315
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '92aff4c1097d'
+revision = 'c0cbefcc9625'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -21,10 +21,13 @@ def upgrade():
     op.create_table('organizations',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=120), nullable=False),
+    sa.Column('email', sa.String(length=120), nullable=False),
     sa.Column('image_url', sa.String(length=255), nullable=False),
     sa.Column('approval_status', sa.Boolean(), nullable=True),
     sa.Column('description', sa.String(length=255), nullable=False),
-    sa.PrimaryKeyConstraint('id')
+    sa.Column('_password_hash', sa.String(length=128), nullable=False),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('email')
     )
     op.create_table('users',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -39,10 +42,10 @@ def upgrade():
     op.create_table('donations',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('amount', sa.Float(), nullable=False),
-    sa.Column('donor_id', sa.Integer(), nullable=True),
-    sa.Column('organization_id', sa.Integer(), nullable=False),
     sa.Column('anonymous', sa.Boolean(), nullable=True),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
+    sa.Column('donor_id', sa.Integer(), nullable=True),
+    sa.Column('organization_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['donor_id'], ['users.id'], name=op.f('fk_donations_donor_id_users')),
     sa.ForeignKeyConstraint(['organization_id'], ['organizations.id'], name=op.f('fk_donations_organization_id_organizations')),
     sa.PrimaryKeyConstraint('id')

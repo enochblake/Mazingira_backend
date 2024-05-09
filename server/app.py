@@ -11,7 +11,7 @@ CORS(app)
 
 
 app.secret_key = b'Y\xf1Xz\x00\xad|eQ\x80t \xca\x1a\x10K'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mazingira.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
 
@@ -29,23 +29,6 @@ def index():
     return '<h1>Welcome To Mazingira</h1>'
 
 class AdminDashboard(Resource):
-    def get(self):
-        resp = make_response({
-            'project': 'Mazingira',
-            'authors': 'John, Enoch, Charity, Priscilla, Dennis'
-        }, 200)
-        # print(Organization.query.one())
-        return resp
-    # View All food as the Admin and perform all CRUD operations
-    # def get(self):
-    #     orgs_list = [{
-    #         'id': organization.id,
-    #         'name': organization.name,
-    #         'image_url': organization.image_url,
-    #         'approval_status': organization.approval_status,
-    #         'description': organization.description,
-    #     } for organization in Organization.query.all()]
-    #     return make_response(jsonify(orgs_list), 200)
     def get(self):
         try:
             orgs = []
