@@ -49,7 +49,7 @@ class Organization(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
     image_url = db.Column(db.String(255), nullable=False)
-    approved = db.Column(db.Boolean, default=False)
+    approval_status = db.Column(db.Boolean, default=False)
     description = db.Column(db.String(255), nullable=False)
 
     def __repr__(self):
