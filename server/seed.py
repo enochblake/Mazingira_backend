@@ -1,30 +1,49 @@
 from models import db, User, Organization, Donation, Story
 from app import app
+from faker import Faker
+
+fake = Faker()
 
 with app.app_context():
 
+    # Delete All Rows To Work On A Clean Slate
     User.query.delete()
     Organization.query.delete()
     Donation.query.delete()
     Story.query.delete()
 
-    admin = User(email="admin@mazingira.com", first_name="Jay",last_name="Kimani", password_hash="admin", role="admin")
-    donor = User(email="user@mazingira.com", first_name="Priscilla",last_name="Wakahia", password_hash="user")
-    organization = Organization(name="Red Cross",email="org@example.com", image_url="werere", description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ac nunc vel justo ullamcorper malesuada. Quisque euismod sapien sit amet nulla efficitur, sed sollicitudin dolor fringilla. Integer euismod turpis nec eros ultricies, sit amet tempus diam laoreet. Vivamus id felis auctor, aliquet ante ac, congue libero. Nulla facilisi. Phasellus nec nisi at libero facilisis condimentum. Sed vestibulum justo nec risus fermentum, id feugiat turpis convallis. Aenean nec mauris nec justo pharetra ultricies. Nullam nec neque sit amet mauris ultricies accumsan. Suspendisse potenti. Sed nec libero id est varius facilisis.", password_hash="user")
-    donation = Donation(amount=230, donor_id=1, organization_id=1)
-    story = Story(title="Story 1", content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ac nunc vel justo ullamcorper malesuada. Quisque euismod sapien sit amet nulla efficitur, sed sollicitudin dolor fringilla. Integer euismod turpis nec eros ultricies, sit amet tempus diam laoreet. Vivamus id felis auctor, aliquet ante ac, congue libero. Nulla facilisi. Phasellus nec nisi at libero facilisis condimentum. Sed vestibulum justo nec risus fermentum, id feugiat turpis convallis. Aenean nec mauris nec justo pharetra ultricies. Nullam nec neque sit amet mauris ultricies accumsan. Suspendisse potenti. Sed nec libero id est varius facilisis.", organization_id=1)
+    # Populate User Table
 
+    for x in range(30):
+        donor = User(email=fake.ascii_free_email(), first_name=fake.first_name(), last_name=fake.last_name(), password_hash=fake.name())
+        db.session.add(donor)
+        db.session.commit
+    print('Donors Created')
+
+    # Populate Organization Table
+
+    for x in range(10):
+        organization = Organization(name=fake.company(), email=fake.company_email(), image_url="https://cleanmanagement.com/wp-content/uploads/2023/10/CleanManagementEnvironmentalGroup-252418-Environmental-Protection-Agency-blogbanner1.jpg", description=fake.paragraph(nb_sentences=4), password_hash=fake.name())
+        db.session.add(organization)
+        db.session.commit()
+    print('Organization Created')
+
+    admin = User(email="admin@mazingira.com", first_name="Jay",last_name="Kimani", password_hash="admin", role="admin")
     db.session.add(admin)
     db.session.commit()
-    db.session.add(donor)
-    db.session.commit()
-    print('Users Created')
-    db.session.add(organization)
-    db.session.commit()
-    print('Organization Created')
-    db.session.add(donation)
-    db.session.commit()
+
+    # Populate Donation Table
+
+    for x in range(50):
+        donation = Donation(amount=fake.random_int(min=500, max=10000), donor_id=fake.random_int(min=1, max=30), organization_id=fake.random_int(min=1, max=10))
+        db.session.add(donation)
+        db.session.commit()
     print('Donation Created')
-    db.session.add(story)
-    db.session.commit()
+
+    # Populate Story Table
+    for x in range(40):
+        story = Story(title=fake.name(), content=fake.paragraph(nb_sentences=6), organization_id=fake.random_int(min=1, max=10))
+        db.session.add(story)
+        db.session.commit()
     print('Story Created')
+    #  image_url="https://pbs.twimg.com/media/FpmD9sMXEAA4Mb7.jpg"

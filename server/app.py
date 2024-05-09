@@ -36,6 +36,7 @@ class AdminDashboard(Resource):
                 orgs.append({
                     'id': organization.id,
                     'name': organization.name,
+                    'email': organization.email,
                     'image_url': organization.image_url,
                     'approval_status': organization.approval_status,
                     'description': organization.description,
@@ -46,26 +47,14 @@ class AdminDashboard(Resource):
                 return make_response(jsonify({'message': 'No Organizations Found'}), 404)
         except Exception as e:
             return make_response(jsonify({'message': 'An error occurred', 'error': str(e)}), 500)
-    
-    def post(self):
-        pass
-
-    def patch(self):
-        pass
-
-    # def delete(self,id):
+    # def delete(self, id):
     #     organization = organization = Organization.query.filter_by(id=id).first()
-    #     organization.query.delete()
-    #     return f"Deletion Successful"
-
-    def delete(self, id):
-        organization = Organization.query.get(id)
-        if organization:
-            db.session.delete(organization)
-            db.session.commit()
-            return {'message': 'Organization deleted successfully'}, 200
-        else:
-            return {'message': 'Organization not found'}, 404
+    #     if organization:
+    #         db.session.delete(organization)
+    #         db.session.commit()
+    #         return {'message': 'Organization deleted successfully'}, 200
+    #     else:
+    #         return {'message': 'Organization not found'}, 404
 
 # EndPoints
 api.add_resource(AdminDashboard, '/admin', endpoint='admin')
