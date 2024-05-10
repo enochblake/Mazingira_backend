@@ -117,6 +117,22 @@ class DonorOrganizations(Resource):
                 return make_response(jsonify({'message': 'No Organizations Found'}), 404)
         except Exception as e:
             return make_response(jsonify({'message': 'An error occurred', 'error': str(e)}), 500)
+        
+class DonorOrganizationByID(Resource):
+
+    def get(self, id):
+        organization = Organization.query.filter(Organization.id == id, Organization.approval_status == True).first()
+        if organization is None:
+            return make_response(jsonify({'message': 'The requested Organization does not exist'}), 404)
+        else:
+            return make_response(jsonify({
+                'id': organization.id,
+                'name': organization.name,
+                'email': organization.email,
+                'image_url': organization.image_url,
+                'approval_status': organization.approval_status,
+                'description': organization.description,
+            }), 200)
 
 
 # Organizations Endpoints
@@ -133,6 +149,7 @@ api.add_resource(AdminOrganizations, '/admin', endpoint='admin_organizations')
 api.add_resource(AdminOrganizationByID, '/admin/<int:id>', endpoint='admin_organizations_by_id')
 api.add_resource(OrganizationDashboard, '/organization', endpoint='organization_dashboard')
 api.add_resource(DonorOrganizations, '/donor/organization', endpoint='donor_organizations')
+api.add_resource(DonorOrganizationByID, '/donor/organization/<int:id>', endpoint='donor_organization_by_id')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
