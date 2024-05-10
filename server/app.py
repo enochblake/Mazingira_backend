@@ -2,8 +2,7 @@ from flask import Flask, make_response, jsonify, request
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_restful import Api, Resource
-from models import db, Organization
-# , User, Donation, Story
+from models import db, Organization , User, Donation, Story
 # from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
@@ -27,6 +26,8 @@ api = Api(app)
 @app.route('/')
 def index():
     return '<h1>Welcome To Mazingira</h1>'
+
+# Admin Endpoints
 
 class AdminOrganizations(Resource):
     def get(self):
@@ -67,7 +68,7 @@ class AdminOrganizationByID(Resource):
         
     def patch(self, id):
         # Approve/Update an existing Organization
-        
+
         organization = Organization.query.filter(Organization.id == id).first()
         if not organization:
             return {'message': 'Organization not found'}, 404
@@ -94,10 +95,44 @@ class AdminOrganizationByID(Resource):
         else:
             return {'message': 'Organization not found'}, 404
 
+# Donor Endpoints
+
+class DonorOrganizations(Resource):
+
+    def get(self):
+        try:
+            orgs = []
+            for organization in Organization.query.filter_by(approval_status = True).all():
+                orgs.append({
+                    'id': organization.id,
+                    'name': organization.name,
+                    'email': organization.email,
+                    'image_url': organization.image_url,
+                    'approval_status': organization.approval_status,
+                    'description': organization.description,
+                })
+            if orgs:
+                return make_response(jsonify({'message': 'success', 'data': orgs}), 200)
+            else:
+                return make_response(jsonify({'message': 'No Organizations Found'}), 404)
+        except Exception as e:
+            return make_response(jsonify({'message': 'An error occurred', 'error': str(e)}), 500)
+
+
+# Organizations Endpoints
+
+class OrganizationDashboard(Resource):
+    
+    def get(self):
+        pass
+
+
+
 # EndPoints
 api.add_resource(AdminOrganizations, '/admin', endpoint='admin_organizations')
 api.add_resource(AdminOrganizationByID, '/admin/<int:id>', endpoint='admin_organizations_by_id')
-
+api.add_resource(OrganizationDashboard, '/organization', endpoint='organization_dashboard')
+api.add_resource(DonorOrganizations, '/donor/organization', endpoint='donor_organizations')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

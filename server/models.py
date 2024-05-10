@@ -59,6 +59,8 @@ class Organization(db.Model, SerializerMixin):
     image_url = db.Column(db.String, nullable=False)
     approval_status = db.Column(db.Boolean, default=False)
     description = db.Column(db.String, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, onupdate=db.func.now())
     _password_hash = db.Column(db.String, nullable=False)
 
     donations = db.relationship('Donation', backref='organization')
