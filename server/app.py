@@ -133,6 +133,26 @@ class DonorOrganizationByID(Resource):
                 'approval_status': organization.approval_status,
                 'description': organization.description,
             }), 200)
+        
+
+class Donate(Resource):
+
+    def post(self):
+        
+        donation = Donation(
+            amount=request.json['amount'],
+            anonymous=request.json['anonymous'],
+            donor_id = request.json['donor_id'],
+            organization_id = request.json['organization_id'])
+        db.session.add(donation)
+        db.session.commit()
+        return make_response(jsonify({
+            'id': donation.id,
+            'amount': donation.amount,
+            'anonymous': donation.anonymous,
+            'donor_id': donation.donor_id,
+            'organization_id': donation.organization_id
+        }), 200)
 
 
 # Organizations Endpoints
@@ -150,6 +170,7 @@ api.add_resource(AdminOrganizationByID, '/admin/<int:id>', endpoint='admin_organ
 api.add_resource(OrganizationDashboard, '/organization', endpoint='organization_dashboard')
 api.add_resource(DonorOrganizations, '/donor/organization', endpoint='donor_organizations')
 api.add_resource(DonorOrganizationByID, '/donor/organization/<int:id>', endpoint='donor_organization_by_id')
+api.add_resource(Donate, '/donate', endpoint='donate')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
