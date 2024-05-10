@@ -24,6 +24,7 @@ class User(db.Model, SerializerMixin):
     donations = db.relationship('Donation', backref='user')
 # Association proxy
     organizations = association_proxy('donations', 'organization', creator=lambda organization_obj: Donation(organization=organization_obj))
+    stories = association_proxy('donations', 'story', creator=lambda story_obj: Donation(story=story_obj))
     
     def __repr__(self):
         return f'<User: Id: {self.id}, Name: {self.first_name} {self.last_name}>'

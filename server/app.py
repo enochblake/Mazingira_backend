@@ -153,6 +153,27 @@ class Donate(Resource):
             'donor_id': donation.donor_id,
             'organization_id': donation.organization_id
         }), 200)
+    
+# class BeneficiariesStories(Resource):
+
+#     def get(self):
+#         try:
+#             stories = []
+#             for story in Story.query.filter_by(organization_id=2).all():
+#                 stories.append({
+#                     'id': story.id,
+#                     'title': story.title,
+#                     'content': story.content,
+#                     'image_url': story.image_url,
+#                     'created_at': story.created_at,
+#                     'organization_id': story.organization_id,
+#                 })
+#             if stories:
+#                 return make_response(jsonify({'message': 'success', 'data': stories}), 200)
+#             else:
+#                 return make_response(jsonify({'message': 'No Organizations Found'}), 404)
+#         except Exception as e:
+#             return make_response(jsonify({'message': 'An error occurred', 'error': str(e)}), 500)
 
 
 # Organizations Endpoints
@@ -162,12 +183,34 @@ class OrganizationDashboard(Resource):
     def get(self):
         pass
 
+class OrganizationNonAnonymousDonations(Resource):
+    
+    def get(self):
+        try:
+            donations = []
+            for donation in Donation.query.filter_by(anonymous = False).all():
+                donations.append({
+                    'id': donation.id,
+                    'amount': donation.amount,
+                    'created_at': donation.created_at,
+                    'donor_id': donation.donor_id,
+                    'organization_id': donation.organization_id,
+                    
+                })
+            if donations:
+                return make_response(jsonify({'message': 'success', 'data': donations}), 200)
+            else:
+                return make_response(jsonify({'message': 'No Organizations Found'}), 404)
+        except Exception as e:
+            return make_response(jsonify({'message': 'An error occurred', 'error': str(e)}), 500)
+
 
 
 # EndPoints
 api.add_resource(AdminOrganizations, '/admin', endpoint='admin_organizations')
 api.add_resource(AdminOrganizationByID, '/admin/<int:id>', endpoint='admin_organizations_by_id')
 api.add_resource(OrganizationDashboard, '/organization', endpoint='organization_dashboard')
+api.add_resource(OrganizationNonAnonymousDonations, '/organization/donations', endpoint='non_anonymous_donations')
 api.add_resource(DonorOrganizations, '/donor/organization', endpoint='donor_organizations')
 api.add_resource(DonorOrganizationByID, '/donor/organization/<int:id>', endpoint='donor_organization_by_id')
 api.add_resource(Donate, '/donate', endpoint='donate')
