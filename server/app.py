@@ -243,26 +243,27 @@ class Donate(Resource):
             'organization_id': donation.organization_id
         }), 200)
     
-# class BeneficiariesStories(Resource):
+class BeneficiariesStories(Resource):
 
-#     def get(self):
-#         try:
-#             stories = []
-#             for story in Story.query.filter_by(organization_id=2).all():
-#                 stories.append({
-#                     'id': story.id,
-#                     'title': story.title,
-#                     'content': story.content,
-#                     'image_url': story.image_url,
-#                     'created_at': story.created_at,
-#                     'organization_id': story.organization_id,
-#                 })
-#             if stories:
-#                 return make_response(jsonify({'message': 'success', 'data': stories}), 200)
-#             else:
-#                 return make_response(jsonify({'message': 'No Organizations Found'}), 404)
-#         except Exception as e:
-#             return make_response(jsonify({'message': 'An error occurred', 'error': str(e)}), 500)
+    def get(self):
+        try:
+            user = User.query.filter(User.id == session['user_id']).first()
+            stories = []
+            for story in user.donated_stories():
+                stories.append({
+                    'id': story.id,
+                    'title': story.title,
+                    'content': story.content,
+                    'image_url': story.image_url,
+                    'created_at': story.created_at,
+                    'organization_id': story.organization_id,
+                })
+            if stories:
+                return make_response(jsonify({'message': 'success', 'data': stories}), 200)
+            else:
+                return make_response(jsonify({'message': 'No Stories Found. Make A Donation First'}), 404)
+        except Exception as e:
+            return make_response(jsonify({'message': 'An error occurred', 'error': str(e)}), 500)
 
 
 # Organizations Endpoints
@@ -353,6 +354,7 @@ api.add_resource(OrganizationCreateStories, '/org/createpost', endpoint='create_
 api.add_resource(DonorOrganizations, '/donor/organization', endpoint='donor_organizations')
 api.add_resource(DonorOrganizationByID, '/donor/organization/<int:id>', endpoint='donor_organization_by_id')
 api.add_resource(Donate, '/donate', endpoint='donate')
+api.add_resource(BeneficiariesStories, '/donor/stories', endpoint='beneficiaries_stories')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

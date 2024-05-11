@@ -25,10 +25,16 @@ class User(db.Model, SerializerMixin):
     donations = db.relationship('Donation', backref='user')
 # Association proxy
     organizations = association_proxy('donations', 'organization', creator=lambda organization_obj: Donation(organization=organization_obj))
-    stories = association_proxy('donations', 'story', creator=lambda story_obj: Donation(story=story_obj))
+    # stories = association_proxy('stories', 'organization', creator=lambda organization_obj: Donation(organization=organization_obj))
     
     def __repr__(self):
         return f'<User: Id: {self.id}, Name: {self.first_name} {self.last_name}>'
+    
+    def donated_stories(self):
+        # Get the organization ids of organizations the user donated to
+        organization_ids = {donation.organization_id for donation in self.donations}
+        # Query stories where organization_id is in organization_ids
+        return Story.query.filter(Story.organization_id.in_(organization_ids)).all()
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
