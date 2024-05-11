@@ -15,7 +15,8 @@ with app.app_context():
     # Populate User Table
 
     for x in range(30):
-        donor = User(email=fake.ascii_free_email(), first_name=fake.first_name(), last_name=fake.last_name(), password_hash=fake.name())
+        donor = User(email=fake.ascii_free_email(), first_name=fake.first_name(), last_name=fake.last_name())
+        donor.set_password(fake.name())
         db.session.add(donor)
         db.session.commit
     print('Donors Created')
@@ -23,12 +24,14 @@ with app.app_context():
     # Populate Organization Table
 
     for x in range(10):
-        organization = Organization(name=fake.company(), email=fake.company_email(), image_url="https://cleanmanagement.com/wp-content/uploads/2023/10/CleanManagementEnvironmentalGroup-252418-Environmental-Protection-Agency-blogbanner1.jpg", description=fake.paragraph(nb_sentences=4), password_hash=fake.name())
+        organization = Organization(name=fake.company(), email=fake.company_email(), image_url="https://cleanmanagement.com/wp-content/uploads/2023/10/CleanManagementEnvironmentalGroup-252418-Environmental-Protection-Agency-blogbanner1.jpg", description=fake.paragraph(nb_sentences=4))
+        organization.set_password(fake.name())
         db.session.add(organization)
         db.session.commit()
     print('Organization Created')
 
-    admin = User(email="admin@mazingira.com", first_name="Jay",last_name="Kimani", password_hash="admin", role="admin")
+    admin = User(email="admin@mazingira.com", first_name="Jay",last_name="Kimani", role="admin")
+    admin.set_password('admin')
     db.session.add(admin)
     db.session.commit()
 

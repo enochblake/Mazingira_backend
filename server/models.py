@@ -3,6 +3,7 @@ from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy import MetaData
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
+from werkzeug.security import generate_password_hash, check_password_hash
 
 metadata = MetaData(naming_convention={
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
@@ -18,8 +19,8 @@ class User(db.Model, SerializerMixin):
     email = db.Column(db.String, unique=True, nullable=False)
     first_name = db.Column(db.String, nullable=False)
     last_name = db.Column(db.String, nullable=False)
-    _password_hash = db.Column(db.String, nullable=False)
-    role = db.Column(db.String, nullable=False, default='donor')  # Roles: 'donor', 'admin'
+    password_hash = db.Column(db.String, nullable=False)
+    role = db.Column(db.String, nullable=False, default='donor')  # Roles: 'donor', 'admin', 'org'
 
     donations = db.relationship('Donation', backref='user')
 # Association proxy
@@ -29,26 +30,11 @@ class User(db.Model, SerializerMixin):
     def __repr__(self):
         return f'<User: Id: {self.id}, Name: {self.first_name} {self.last_name}>'
 
-    # this is a special property decorator for sqlalchemy
-    # it leaves all of the sqlalchemy characteristics of the column in place
-    @hybrid_property
-    def password_hash(self):
-        return self._password_hash
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
 
-    # setter method for the password property
-    @password_hash.setter
-    def password_hash(self, password):
-        self._password_hash = self.simple_hash(password)
-
-    # authentication method using user and password
     def authenticate(self, password):
-        return self.simple_hash(password) == self._password_hash
-
-    # simple_hash requires no access to the class or instance
-    # let's leave it static
-    @staticmethod
-    def simple_hash(input):
-        return sum(bytearray(input, encoding='utf-8'))
+        return check_password_hash(self.password_hash, password)
     
 class Organization(db.Model, SerializerMixin):
     __tablename__ = 'organizations'
@@ -62,7 +48,7 @@ class Organization(db.Model, SerializerMixin):
     description = db.Column(db.String, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
-    _password_hash = db.Column(db.String, nullable=False)
+    password_hash = db.Column(db.String, nullable=False)
 
     donations = db.relationship('Donation', backref='organization')
     stories = db.relationship('Story', backref='organization')
@@ -70,27 +56,12 @@ class Organization(db.Model, SerializerMixin):
     def __repr__(self):
         return f'<Organization: Id: {self.id}, Organization: {self.name} Details: {self.description}>'
     
-    # this is a special property decorator for sqlalchemy
-    # it leaves all of the sqlalchemy characteristics of the column in place
-    @hybrid_property
-    def password_hash(self):
-        return self._password_hash
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
 
-    # setter method for the password property
-    @password_hash.setter
-    def password_hash(self, password):
-        self._password_hash = self.simple_hash(password)
-
-    # authentication method using user and password
     def authenticate(self, password):
-        return self.simple_hash(password) == self._password_hash
-
-    # simple_hash requires no access to the class or instance
-    # let's leave it static
-    @staticmethod
-    def simple_hash(input):
-        return sum(bytearray(input, encoding='utf-8'))
-
+        return check_password_hash(self.password_hash, password)
+    
 class Donation(db.Model, SerializerMixin):
     __tablename__ = 'donations'
     serialize_rules = ('-donation.users', '-donation.organizations',)

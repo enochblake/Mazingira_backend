@@ -1,4 +1,4 @@
-from flask import Flask, make_response, jsonify, request
+from flask import Flask, make_response, jsonify, request, session
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_restful import Api, Resource
@@ -26,6 +26,55 @@ api = Api(app)
 @app.route('/')
 def index():
     return '<h1>Welcome To Mazingira</h1>'
+
+# AUTHENTICATION
+
+class Login(Resource):
+
+    def post(self):
+        data = request.get_json()
+        if data:
+            email = request.get_json()['email']
+            user = User.query.filter(User.email == email).first()
+            password = request.get_json()['password']
+            
+            if user and user.authenticate(password) == True:
+                # print(user.authenticate(password))
+                session['user_id'] = user.id
+                session['user_role'] = user.role
+                user_dict = {
+                'id': user.id,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'email': user.email,
+                'role': user.role,
+                }
+                return make_response(user_dict, 200)
+            else:
+                return make_response({'error': 'Invalid username or password'}, 401)
+class CheckSession(Resource):
+
+    def get(self):
+        if session.get('user_id'):
+            user = User.query.filter(User.id == session.get('user_id')).first()
+            user_dict = {
+                'id': user.id,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'email': user.email,
+                'role': user.role,
+                }
+            return make_response(user_dict, 200)
+        else:
+            return {'message': '401: Not Authorized'}, 401
+class Logout(Resource):
+
+    def delete(self):
+        session['user_id'] = None
+        session['user_role'] = None
+        return {'message': '204: No Content'}, 204
+
+
 
 # Admin Endpoints
 
@@ -207,6 +256,9 @@ class OrganizationNonAnonymousDonations(Resource):
 
 
 # EndPoints
+api.add_resource(Login, '/login', endpoint='login')
+api.add_resource(CheckSession, '/check_session', endpoint='checksession')     
+api.add_resource(Logout, '/logout', endpoint='logout')
 api.add_resource(AdminOrganizations, '/admin', endpoint='admin_organizations')
 api.add_resource(AdminOrganizationByID, '/admin/<int:id>', endpoint='admin_organizations_by_id')
 api.add_resource(OrganizationDashboard, '/organization', endpoint='organization_dashboard')
