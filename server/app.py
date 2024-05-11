@@ -314,6 +314,28 @@ class OrganizationNonAnonymousDonations(Resource):
                 return make_response(jsonify({'message': 'No Organizations Found'}), 404)
         except Exception as e:
             return make_response(jsonify({'message': 'An error occurred', 'error': str(e)}), 500)
+        
+class OrganizationCreateStories(Resource):
+
+    def post(self):
+        
+        story = Story(
+            title=request.json['title'],
+            content=request.json['title'],
+            image_url=request.json['title'],
+            organization_id=session['user_id']
+        )
+        db.session.add(story)
+        db.session.commit()
+        return make_response(jsonify({
+            'id': story.id,
+            'title': story.title,
+            'content': story.content,
+            'image_url': story.image_url,
+            'organization_id': story.organization_id,
+            'created_at': story.created_at
+        }), 200)
+
 
 
 
@@ -327,6 +349,7 @@ api.add_resource(AdminOrganizationByID, '/admin/<int:id>', endpoint='admin_organ
 api.add_resource(SetUpOrganizationDetails, '/org/edit', endpoint='set_up_organization_details')
 api.add_resource(OrganizationDashboard, '/organization', endpoint='organization_dashboard')
 api.add_resource(OrganizationNonAnonymousDonations, '/organization/donations', endpoint='non_anonymous_donations')
+api.add_resource(OrganizationCreateStories, '/org/createpost', endpoint='create_post')
 api.add_resource(DonorOrganizations, '/donor/organization', endpoint='donor_organizations')
 api.add_resource(DonorOrganizationByID, '/donor/organization/<int:id>', endpoint='donor_organization_by_id')
 api.add_resource(Donate, '/donate', endpoint='donate')
