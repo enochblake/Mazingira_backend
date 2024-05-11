@@ -29,7 +29,7 @@ def index():
 
 # AUTHENTICATION
 
-class Login(Resource):
+class UserLogin(Resource):
 
     def post(self):
         data = request.get_json()
@@ -52,10 +52,37 @@ class Login(Resource):
                 return make_response(user_dict, 200)
             else:
                 return make_response({'error': 'Invalid username or password'}, 401)
+
+class OrganizationLogin(Resource):
+
+    def post(self):
+        data = request.get_json()
+        if data:
+            email = request.get_json()['email']
+            org = Organization.query.filter(Organization.email == email).first()
+            password = request.get_json()['password']
+            
+            if org and org.authenticate(password) == True:
+                # print(user.authenticate(password))
+                session['user_id'] = org.id
+                session['user_role'] = org.role
+                org_dict = {
+                'id': org.id,
+                'name': org.name,
+                'approval_status': org.approval_status,
+                'email': org.email,
+                'description': org.description,
+                'image_url': org.image_url,
+                'registered_on': org.created_at,
+                'application_reviewed_on': org.updated_at
+                }
+                return make_response(org_dict, 200)
+            else:
+                return make_response({'error': 'Invalid username or password'}, 401)
 class CheckSession(Resource):
 
     def get(self):
-        if session.get('user_id'):
+        if session.get('user_id') and session['user_role'] != 'org':
             user = User.query.filter(User.id == session.get('user_id')).first()
             user_dict = {
                 'id': user.id,
@@ -65,6 +92,19 @@ class CheckSession(Resource):
                 'role': user.role,
                 }
             return make_response(user_dict, 200)
+        elif session.get('user_id') and session['user_role'] == 'org':
+            org = Organization.query.filter(Organization.id == session.get('user_id')).first()
+            org_dict = {
+                'id': org.id,
+                'name': org.name,
+                'approval_status': org.approval_status,
+                'email': org.email,
+                'description': org.description,
+                'image_url': org.image_url,
+                'registered_on': org.created_at,
+                'application_reviewed_on': org.updated_at
+                }
+            return make_response(org_dict, 200)
         else:
             return {'message': '401: Not Authorized'}, 401
 class Logout(Resource):
@@ -232,6 +272,28 @@ class OrganizationDashboard(Resource):
     def get(self):
         pass
 
+    # Set Up Organization Details
+class SetUpOrganizationDetails(Resource):
+
+    def patch(self):
+        # Edit/Setup an approved Organization
+        organization = Organization.query.filter(Organization.id == session['user_id']).first()
+        if not organization:
+            return {'message': 'Organization not approved or found. Contact Admin'}, 404
+        
+        for attr in request.json:
+            setattr(organization, attr, request.json[attr])
+
+        db.session.commit()
+        return {'message': 'Organization Updated Successfully', 'organization': {
+            'id': organization.id,
+            'name': organization.name,
+            'email': organization.email,
+            'image_url': organization.image_url,
+            'approval_status': organization.approval_status,
+            'description': organization.description,
+        }}, 200
+
 class OrganizationNonAnonymousDonations(Resource):
     
     def get(self):
@@ -256,11 +318,13 @@ class OrganizationNonAnonymousDonations(Resource):
 
 
 # EndPoints
-api.add_resource(Login, '/login', endpoint='login')
+api.add_resource(UserLogin, '/login', endpoint='login')
+api.add_resource(OrganizationLogin, '/org/login', endpoint='organization_login')
 api.add_resource(CheckSession, '/check_session', endpoint='checksession')     
 api.add_resource(Logout, '/logout', endpoint='logout')
 api.add_resource(AdminOrganizations, '/admin', endpoint='admin_organizations')
 api.add_resource(AdminOrganizationByID, '/admin/<int:id>', endpoint='admin_organizations_by_id')
+api.add_resource(SetUpOrganizationDetails, '/org/edit', endpoint='set_up_organization_details')
 api.add_resource(OrganizationDashboard, '/organization', endpoint='organization_dashboard')
 api.add_resource(OrganizationNonAnonymousDonations, '/organization/donations', endpoint='non_anonymous_donations')
 api.add_resource(DonorOrganizations, '/donor/organization', endpoint='donor_organizations')

@@ -21,19 +21,27 @@ with app.app_context():
         db.session.commit
     print('Donors Created')
 
-    # Populate Organization Table
-
-    for x in range(10):
-        organization = Organization(name=fake.company(), email=fake.company_email(), image_url="https://cleanmanagement.com/wp-content/uploads/2023/10/CleanManagementEnvironmentalGroup-252418-Environmental-Protection-Agency-blogbanner1.jpg", description=fake.paragraph(nb_sentences=4))
-        organization.set_password(fake.name())
-        db.session.add(organization)
-        db.session.commit()
-    print('Organization Created')
-
     admin = User(email="admin@mazingira.com", first_name="Jay",last_name="Kimani", role="admin")
     admin.set_password('admin')
     db.session.add(admin)
     db.session.commit()
+    print('Admin Created')
+
+    # Populate Organization Table
+
+    for x in range(10):
+        organization = Organization(name=fake.company(), email=fake.company_email())
+        organization.set_password(fake.name())
+        db.session.add(organization)
+        db.session.commit()
+    print('Organizations Created')
+
+    organization = Organization(name='Just An Organization', email='org@mazingira.com',)
+    organization.set_password('password')
+    db.session.add(organization)
+    db.session.commit()
+    print('Organization Created')
+
 
     # Populate Donation Table
 
