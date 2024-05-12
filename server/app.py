@@ -3,7 +3,6 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_restful import Api, Resource
 from models import db, Organization , User, Donation, Story
-# from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
 CORS(app)
@@ -21,7 +20,27 @@ migrate = Migrate(app, db)
 db.init_app(app)
 
 api = Api(app)
-# bcrypt = Bcrypt(app)
+
+@app.before_request
+def check_if_logged_in():
+    allowed_admin_endpoints = ['logout','admin_organizations', 'admin_organizations_by_id', 'checksession' ]
+    allowed_donor_endpoints = ['logout','donor_organizations', 'donor_organization_by_id', 'donate', 'beneficiaries_stories', 'checksession']
+    allowed_organization_endpoints = ['logout','organization_dashboard', 'set_up_organization_details', 'non_anonymous_donations', 'create_post', 'checksession']
+
+    if session.get('user_id'):
+        if session.get('user_role') == 'donor':
+            if request.endpoint not in allowed_donor_endpoints:
+                return {'error': 'Unauthorized To Access This Resource'}, 401
+        elif session.get('user_role') == 'admin':
+            if request.endpoint not in allowed_admin_endpoints:
+                return {'error': 'Unauthorized To Access This Resource'}, 401
+        # elif session.get('user_role') == 'org':
+        else:
+            if request.endpoint not in allowed_organization_endpoints:
+                return {'error': 'Unauthorized To Access This Resource'}, 401
+    else:
+        if request.endpoint not in ['checksession','organization_login', 'login', 'home', 'register_user', 'register_organization']:
+            return {'error': 'Unauthorized Log In First'}, 401
 
 @app.route('/')
 def index():
@@ -146,7 +165,7 @@ class CheckSession(Resource):
                 }
             return make_response(org_dict, 200)
         else:
-            return {'message': '401: Not Authorized'}, 401
+            return {'message': 'Log In To Access Resource or Contact Mazingira'}, 401
 class Logout(Resource):
 
     def delete(self):
@@ -271,7 +290,7 @@ class Donate(Resource):
         donation = Donation(
             amount=request.json['amount'],
             anonymous=request.json['anonymous'],
-            donor_id = request.json['donor_id'],
+            donor_id = session['user_id'],                  
             organization_id = request.json['organization_id'])
         db.session.add(donation)
         db.session.commit()
@@ -335,19 +354,21 @@ class SetUpOrganizationDetails(Resource):
             'description': organization.description,
         }}, 200
 
-class OrganizationNonAnonymousDonations(Resource):
+class OrganizationDonations(Resource):
     
     def get(self):
         try:
             donations = []
-            for donation in Donation.query.filter_by(anonymous = False).all():
+            for donation in Donation.query.all():
+                user = User.query.get(donation.donor_id)
                 donations.append({
                     'id': donation.id,
                     'amount': donation.amount,
-                    'created_at': donation.created_at,
-                    'donor_id': donation.donor_id,
+                    'donated_on': donation.created_at,
                     'organization_id': donation.organization_id,
-                    
+                    'anonymous_status': donation.anonymous,
+                    'donor_first_name': user.first_name,
+                    'donor_last_name': user.last_name
                 })
             if donations:
                 return make_response(jsonify({'message': 'success', 'data': donations}), 200)
@@ -391,7 +412,7 @@ api.add_resource(AdminOrganizationByID, '/admin/<int:id>', endpoint='admin_organ
 api.add_resource(SetUpOrganizationDetails, '/org/edit', endpoint='set_up_organization_details')
 api.add_resource(OrganizationDashboard, '/organization', endpoint='organization_dashboard')
 api.add_resource(RegisterOrganization, '/org/register', endpoint='register_organization')
-api.add_resource(OrganizationNonAnonymousDonations, '/organization/donations', endpoint='non_anonymous_donations')
+api.add_resource(OrganizationDonations, '/organization/donations', endpoint='non_anonymous_donations')
 api.add_resource(OrganizationCreateStories, '/org/createpost', endpoint='create_post')
 api.add_resource(DonorOrganizations, '/donor/organization', endpoint='donor_organizations')
 api.add_resource(DonorOrganizationByID, '/donor/organization/<int:id>', endpoint='donor_organization_by_id')
