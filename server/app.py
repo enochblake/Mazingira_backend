@@ -53,6 +53,46 @@ class UserLogin(Resource):
             else:
                 return make_response({'error': 'Invalid username or password'}, 401)
 
+class RegisterUser(Resource):
+
+    def post(self):
+
+        data = request.get_json()
+        if data:
+            first_name = request.get_json()['first_name']
+            last_name = request.get_json()['last_name']
+            email = request.get_json()['email']
+            password = request.get_json()['password']
+
+            new_user = User(first_name=first_name, last_name=last_name, email=email)
+            new_user.set_password(password)
+            db.session.add(new_user)
+            db.session.commit()
+            resp = {'message': f'Congratulations {first_name} {last_name}! Successfully Registered'}
+            return make_response(resp, 201)
+        else:
+            return make_response({'message': 'All fields have to be filled'}, 401)
+
+
+class RegisterOrganization(Resource):
+
+    def post(self):
+
+        data = request.get_json()
+        if data:
+            name = request.get_json()['name']
+            email = request.get_json()['email']
+            password = request.get_json()['password']
+
+            new_org = Organization(name=name, email=email)
+            new_org.set_password(password)
+            db.session.add(new_org)
+            db.session.commit()
+            resp = {'message': f'Congratulations {name}! Successfully Registered'}
+            return make_response(resp, 201)
+        else:
+            return make_response({'message': 'All fields have to be filled'}, 401)
+
 class OrganizationLogin(Resource):
 
     def post(self):
@@ -341,14 +381,16 @@ class OrganizationCreateStories(Resource):
 
 
 # EndPoints
+api.add_resource(RegisterUser, '/register', endpoint='register_user')
 api.add_resource(UserLogin, '/login', endpoint='login')
 api.add_resource(OrganizationLogin, '/org/login', endpoint='organization_login')
-api.add_resource(CheckSession, '/check_session', endpoint='checksession')     
+api.add_resource(CheckSession, '/check_session', endpoint='checksession')  
 api.add_resource(Logout, '/logout', endpoint='logout')
 api.add_resource(AdminOrganizations, '/admin', endpoint='admin_organizations')
 api.add_resource(AdminOrganizationByID, '/admin/<int:id>', endpoint='admin_organizations_by_id')
 api.add_resource(SetUpOrganizationDetails, '/org/edit', endpoint='set_up_organization_details')
 api.add_resource(OrganizationDashboard, '/organization', endpoint='organization_dashboard')
+api.add_resource(RegisterOrganization, '/org/register', endpoint='register_organization')
 api.add_resource(OrganizationNonAnonymousDonations, '/organization/donations', endpoint='non_anonymous_donations')
 api.add_resource(OrganizationCreateStories, '/org/createpost', endpoint='create_post')
 api.add_resource(DonorOrganizations, '/donor/organization', endpoint='donor_organizations')
