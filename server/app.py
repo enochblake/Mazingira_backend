@@ -1,4 +1,4 @@
-from flask import Flask, make_response, jsonify, request, session
+from flask import Flask, make_response, jsonify, request, session, redirect
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_restful import Api, Resource
@@ -87,8 +87,24 @@ class RegisterUser(Resource):
             new_user.set_password(password)
             db.session.add(new_user)
             db.session.commit()
+
+            user = User.query.filter(User.email == email).first()
+            if user and user.authenticate(password) == True:
+                session['user_id'] = user.id
+                session['user_role'] = user.role
+
+                user_dict = {
+                'id': user.id,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'email': user.email,
+                'role': user.role,
+                }
+                return make_response(user_dict, 200)
+            
             resp = {'message': f'Congratulations {first_name} {last_name}! Successfully Registered'}
             return make_response(resp, 201)
+            # return redirect('/login')
         else:
             return make_response({'message': 'All fields have to be filled'}, 401)
 
@@ -125,17 +141,7 @@ class OrganizationLogin(Resource):
                 # print(user.authenticate(password))
                 session['user_id'] = org.id
                 session['user_role'] = org.role
-                org_dict = {
-                'id': org.id,
-                'name': org.name,
-                'approval_status': org.approval_status,
-                'email': org.email,
-                'description': org.description,
-                'image_url': org.image_url,
-                'registered_on': org.created_at,
-                'application_reviewed_on': org.updated_at
-                }
-                return make_response(org_dict, 200)
+                return redirect('/organization/donations')
             else:
                 return make_response({'error': 'Invalid username or password'}, 401)
 class CheckSession(Resource):
