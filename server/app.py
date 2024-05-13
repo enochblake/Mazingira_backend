@@ -61,14 +61,18 @@ class UserLogin(Resource):
                 # print(user.authenticate(password))
                 session['user_id'] = user.id
                 session['user_role'] = user.role
-                user_dict = {
-                'id': user.id,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
-                'email': user.email,
-                'role': user.role,
-                }
-                return make_response(user_dict, 200)
+                # user_dict = {
+                # 'id': user.id,
+                # 'first_name': user.first_name,
+                # 'last_name': user.last_name,
+                # 'email': user.email,
+                # 'role': user.role,
+                # }
+                # return make_response(user_dict, 200)
+                if user.role == 'donor':
+                    return redirect('donor/organization')
+                else:
+                    return redirect('/admin')
             else:
                 return make_response({'error': 'Invalid username or password'}, 401)
 
@@ -123,8 +127,15 @@ class RegisterOrganization(Resource):
             new_org.set_password(password)
             db.session.add(new_org)
             db.session.commit()
-            resp = {'message': f'Congratulations {name}! Successfully Registered'}
-            return make_response(resp, 201)
+
+            org = Organization.query.filter(Organization.email == email).first()
+
+            if org and org.authenticate(password) == True:
+                session['user_id'] = org.id
+                session['user_role'] = org.role
+                return redirect('/organization/donations')
+            else:
+                return make_response({'error': 'Invalid username or password'}, 401)
         else:
             return make_response({'message': 'All fields have to be filled'}, 401)
 
@@ -178,8 +189,6 @@ class Logout(Resource):
         session['user_id'] = None
         session['user_role'] = None
         return {'message': '204: No Content'}, 204
-
-
 
 # Admin Endpoints
 
