@@ -7,10 +7,11 @@ fake = Faker()
 with app.app_context():
 
     # Delete All Rows To Work On A Clean Slate
-    User.query.delete()
-    Organization.query.delete()
     Donation.query.delete()
+    Beneficiary.query.delete()
     Story.query.delete()
+    Organization.query.delete()
+    User.query.delete()
 
     # Populate User Table
 
@@ -46,7 +47,7 @@ with app.app_context():
     # Populate Donation Table
 
     for x in range(50):
-        donation = Donation(amount=fake.random_int(min=500, max=10000), donor_id=fake.random_int(min=1, max=30), organization_id=fake.random_int(min=1, max=10))
+        donation = Donation(amount=fake.random_int(min=500, max=10000), donor_id=fake.random_int(min=1, max=20), organization_id=fake.random_int(min=1, max=10))
         db.session.add(donation)
         db.session.commit()
     print('Donation Created')

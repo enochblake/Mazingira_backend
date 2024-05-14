@@ -1,8 +1,8 @@
-"""empty message
+"""create db
 
-Revision ID: d38a1740c9b5
+Revision ID: abbaa6c59688
 Revises: 
-Create Date: 2024-05-14 10:57:32.209114
+Create Date: 2024-05-14 19:21:59.550106
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'd38a1740c9b5'
+revision = 'abbaa6c59688'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -25,7 +25,7 @@ def upgrade():
     sa.Column('image_url', sa.String(), nullable=True),
     sa.Column('approval_status', sa.Boolean(), nullable=True),
     sa.Column('description', sa.String(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.Column('password_hash', sa.String(), nullable=False),
     sa.Column('role', sa.String(), nullable=False),
@@ -55,7 +55,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('amount', sa.Float(), nullable=False),
     sa.Column('anonymous', sa.Boolean(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
     sa.Column('donor_id', sa.Integer(), nullable=True),
     sa.Column('organization_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['donor_id'], ['users.id'], name=op.f('fk_donations_donor_id_users')),
@@ -67,7 +67,7 @@ def upgrade():
     sa.Column('title', sa.String(length=120), nullable=False),
     sa.Column('content', sa.Text(), nullable=False),
     sa.Column('image_url', sa.String(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
     sa.Column('organization_id', sa.Integer(), nullable=True),
     sa.Column('beneficiary_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['beneficiary_id'], ['beneficiaries.id'], name=op.f('fk_stories_beneficiary_id_beneficiaries')),
