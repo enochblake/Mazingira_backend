@@ -133,7 +133,7 @@ class RegisterOrganization(Resource):
             if org and org.authenticate(password) == True:
                 session['user_id'] = org.id
                 session['user_role'] = org.role
-                return redirect('/organization/donations')
+                return redirect('/organization')
             else:
                 return make_response({'error': 'Invalid username or password'}, 401)
         else:
@@ -152,7 +152,7 @@ class OrganizationLogin(Resource):
                 # print(user.authenticate(password))
                 session['user_id'] = org.id
                 session['user_role'] = org.role
-                return redirect('/organization/donations')
+                return redirect('/organization')
             else:
                 return make_response({'error': 'Invalid username or password'}, 401)
 class CheckSession(Resource):
@@ -344,8 +344,21 @@ class BeneficiariesStories(Resource):
 
 class OrganizationDashboard(Resource):
     
+    # View Organization Details
+
     def get(self):
-        pass
+        org = Organization.query.filter(Organization.id == session.get('user_id')).first()
+        org_dict = {
+            'id': org.id,
+            'name': org.name,
+            'approval_status': org.approval_status,
+            'email': org.email,
+            'description': org.description,
+            'image_url': org.image_url,
+            'registered_on': org.created_at,
+            'application_reviewed_on': org.updated_at
+            }
+        return make_response(org_dict, 200)
 
     # Set Up Organization Details
 class SetUpOrganizationDetails(Resource):
@@ -374,7 +387,7 @@ class OrganizationDonations(Resource):
     def get(self):
         try:
             donations = []
-            for donation in Donation.query.all():
+            for donation in Donation.query.filter_by(organization_id = session['user_id']):
                 user = User.query.get(donation.donor_id)
                 donations.append({
                     'id': donation.id,
