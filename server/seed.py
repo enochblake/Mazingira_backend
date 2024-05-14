@@ -59,9 +59,11 @@ with app.app_context():
         db.session.commit()
     print('Beneficiaries Created')
 
+    # https://i.pinimg.com/originals/63/f9/d5/63f9d5fd5f34c8544a31c22c3e909cec.jpg
+
     # Populate Story Table
     for x in range(40):
-        story = Story(title=fake.name(), content=fake.paragraph(nb_sentences=6),image_url="https://pbs.twimg.com/media/FpmD9sMXEAA4Mb7.jpg", organization_id=fake.random_int(min=1, max=10), beneficiary_id=fake.random_int(min=1, max=10))
+        story = Story(title=fake.name(), content=fake.paragraph(nb_sentences=6),image_url="https://i.pinimg.com/originals/63/f9/d5/63f9d5fd5f34c8544a31c22c3e909cec.jpg", organization_id=fake.random_int(min=1, max=10), beneficiary_id=fake.random_int(min=1, max=10))
         db.session.add(story)
         db.session.commit()
     print('Stories Created')

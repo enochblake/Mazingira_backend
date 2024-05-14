@@ -2,7 +2,7 @@ from flask import Flask, make_response, jsonify, request, session, redirect
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_restful import Api, Resource
-from models import db, Organization , User, Donation, Story
+from models import db, Organization , User, Donation, Story, Beneficiary
 
 app = Flask(__name__)
 CORS(app)
@@ -25,7 +25,7 @@ api = Api(app)
 def check_if_logged_in():
     allowed_admin_endpoints = ['logout','admin_organizations', 'admin_organizations_by_id', 'checksession' ]
     allowed_donor_endpoints = ['logout','donor_organizations', 'donor_organization_by_id', 'donate', 'beneficiaries_stories', 'checksession']
-    allowed_organization_endpoints = ['logout','organization_dashboard', 'set_up_organization_details', 'non_anonymous_donations', 'create_post', 'checksession']
+    allowed_organization_endpoints = ['logout','organization_dashboard', 'set_up_organization_details', 'non_anonymous_donations', 'create_post', 'create_beneficiary', 'checksession']
 
     if session.get('user_id'):
         if session.get('user_role') == 'donor':
@@ -411,8 +411,8 @@ class OrganizationCreateStories(Resource):
         
         story = Story(
             title=request.json['title'],
-            content=request.json['title'],
-            image_url=request.json['title'],
+            content=request.json['content'],
+            image_url=request.json['image_url'],
             organization_id=session['user_id']
         )
         db.session.add(story)
@@ -425,8 +425,26 @@ class OrganizationCreateStories(Resource):
             'organization_id': story.organization_id,
             'created_at': story.created_at
         }), 200)
+    
+class OrgCreateBeneficiary(Resource):
 
-
+    def post(self):
+        
+        beneficiary = Beneficiary(
+            name=request.json['name'],
+            recieved_amount=request.json['recieved_amount'],
+            image_url=request.json['image_url'],
+            organization_id=session['user_id']
+        )
+        db.session.add(beneficiary)
+        db.session.commit()
+        return make_response(jsonify({
+            'id': beneficiary.id,
+            'name': beneficiary.name,
+            'recieved_amount': beneficiary.recieved_amount,
+            'image_url': beneficiary.image_url,
+            'organization_id': beneficiary.organization_id
+        }), 200)
 
 
 # EndPoints
@@ -441,7 +459,8 @@ api.add_resource(SetUpOrganizationDetails, '/org/edit', endpoint='set_up_organiz
 api.add_resource(OrganizationDashboard, '/organization', endpoint='organization_dashboard')
 api.add_resource(RegisterOrganization, '/org/register', endpoint='register_organization')
 api.add_resource(OrganizationDonations, '/organization/donations', endpoint='non_anonymous_donations')
-api.add_resource(OrganizationCreateStories, '/org/createpost', endpoint='create_post')
+api.add_resource(OrganizationCreateStories, '/createpost', endpoint='create_post')
+api.add_resource(OrgCreateBeneficiary, '/createbeneficiary', endpoint='create_beneficiary')
 api.add_resource(DonorOrganizations, '/donor/organization', endpoint='donor_organizations')
 api.add_resource(DonorOrganizationByID, '/donor/organization/<int:id>', endpoint='donor_organization_by_id')
 api.add_resource(Donate, '/donate', endpoint='donate')
