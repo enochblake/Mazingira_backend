@@ -1,4 +1,4 @@
-from models import db, User, Organization, Donation, Story
+from models import db, User, Organization, Donation, Story, Beneficiary
 from app import app
 from faker import Faker
 
@@ -51,9 +51,17 @@ with app.app_context():
         db.session.commit()
     print('Donation Created')
 
+    # Populate Beneficiaries Table
+
+    for x in range(70):
+        beneficiaries = Beneficiary(name=fake.name(), recieved_amount=fake.random_int(min=500, max=1000), image_url="https://pbs.twimg.com/media/FpmD9sMXEAA4Mb7.jpg", organization_id=fake.random_int(min=1, max=10) )
+        db.session.add(beneficiaries)
+        db.session.commit()
+    print('Beneficiaries Created')
+
     # Populate Story Table
     for x in range(40):
-        story = Story(title=fake.name(), content=fake.paragraph(nb_sentences=6),image_url="https://pbs.twimg.com/media/FpmD9sMXEAA4Mb7.jpg", organization_id=fake.random_int(min=1, max=10))
+        story = Story(title=fake.name(), content=fake.paragraph(nb_sentences=6),image_url="https://pbs.twimg.com/media/FpmD9sMXEAA4Mb7.jpg", organization_id=fake.random_int(min=1, max=10), beneficiary_id=fake.random_int(min=1, max=10))
         db.session.add(story)
         db.session.commit()
-    print('Story Created')
+    print('Stories Created')

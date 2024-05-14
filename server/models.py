@@ -2,7 +2,6 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy import MetaData
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.security import generate_password_hash, check_password_hash
 
 metadata = MetaData(naming_convention={
@@ -59,6 +58,7 @@ class Organization(db.Model, SerializerMixin):
 
     donations = db.relationship('Donation', backref='organization')
     stories = db.relationship('Story', backref='organization')
+    beneficiaries = db.relationship('Beneficiary', backref='organization')
 
     def __repr__(self):
         return f'<Organization: Id: {self.id}, Organization: {self.name} Details: {self.description}>'
@@ -82,6 +82,21 @@ class Donation(db.Model, SerializerMixin):
 
     def __repr__(self):
         return f'<Donation: Id: {self.id}, Amount: {self.amount} Donated At:{self.created_at}>'
+    
+class Beneficiary(db.Model, SerializerMixin):
+    __tablename__ = 'beneficiaries'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    recieved_amount = db.Column(db.Float, nullable=False)
+    image_url = db.Column(db.String)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
+    
+    stories = db.relationship('Story', backref='beneficiary')    
+
+    def __repr__(self):
+        return f"<Beneficiary {self.id}: Name: {self.name}>"
+
 
 class Story(db.Model, SerializerMixin):
     __tablename__ = 'stories'
@@ -92,6 +107,7 @@ class Story(db.Model, SerializerMixin):
     image_url = db.Column(db.String, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
+    beneficiary_id = db.Column(db.Integer, db.ForeignKey('beneficiaries.id'))
 
     def __repr__(self):
         return f'<Story: Id: {self.id}, Title: {self.title} Created At:{self.created_at}>'
