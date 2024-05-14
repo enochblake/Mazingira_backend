@@ -428,6 +428,25 @@ class OrganizationCreateStories(Resource):
     
 class OrgCreateBeneficiary(Resource):
 
+    def get(self):
+        try:
+            beneficiaries = []
+            for beneficiary in Beneficiary.query.filter_by(organization_id = session['user_id']):
+                # user = User.query.get(donation.donor_id)
+                beneficiaries.append({
+                    'id': beneficiary.id,
+                    'name': beneficiary.name,
+                    'recieved_amount': beneficiary.recieved_amount,
+                    'organization_id': beneficiary.organization_id,
+                    'image_url': beneficiary.image_url
+                })
+            if beneficiaries:
+                return make_response(jsonify({'message': 'success', 'data': beneficiaries}), 200)
+            else:
+                return make_response(jsonify({'message': 'No Beneficuaries Found'}), 404)
+        except Exception as e:
+            return make_response(jsonify({'message': 'An error occurred', 'error': str(e)}), 500)
+
     def post(self):
         
         beneficiary = Beneficiary(
@@ -460,7 +479,7 @@ api.add_resource(OrganizationDashboard, '/organization', endpoint='organization_
 api.add_resource(RegisterOrganization, '/org/register', endpoint='register_organization')
 api.add_resource(OrganizationDonations, '/organization/donations', endpoint='non_anonymous_donations')
 api.add_resource(OrganizationCreateStories, '/createpost', endpoint='create_post')
-api.add_resource(OrgCreateBeneficiary, '/createbeneficiary', endpoint='create_beneficiary')
+api.add_resource(OrgCreateBeneficiary, '/beneficiary', endpoint='create_beneficiary')
 api.add_resource(DonorOrganizations, '/donor/organization', endpoint='donor_organizations')
 api.add_resource(DonorOrganizationByID, '/donor/organization/<int:id>', endpoint='donor_organization_by_id')
 api.add_resource(Donate, '/donate', endpoint='donate')
