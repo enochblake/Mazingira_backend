@@ -443,7 +443,7 @@ class OrgCreateBeneficiary(Resource):
             if beneficiaries:
                 return make_response(jsonify({'message': 'success', 'data': beneficiaries}), 200)
             else:
-                return make_response(jsonify({'message': 'No Beneficuaries Found'}), 404)
+                return make_response(jsonify({'message': 'No Organizations Found'}), 404)
         except Exception as e:
             return make_response(jsonify({'message': 'An error occurred', 'error': str(e)}), 500)
 
