@@ -50,6 +50,7 @@ class Organization(db.Model, SerializerMixin):
     email = db.Column(db.String, unique=True, nullable=False)
     image_url = db.Column(db.String)
     approval_status = db.Column(db.Boolean, default=False)
+    category = db.Column(db.String)
     description = db.Column(db.String)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())

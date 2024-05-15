@@ -208,6 +208,8 @@ class AdminOrganizations(Resource):
                     'image_url': organization.image_url,
                     'approval_status': organization.approval_status,
                     'description': organization.description,
+                    'category': organization.category,
+                    'updated_at': organization.updated_at
                 })
             if orgs:
                 return make_response(jsonify(orgs), 200)
@@ -231,6 +233,8 @@ class AdminOrganizationByID(Resource):
                 'image_url': organization.image_url,
                 'approval_status': organization.approval_status,
                 'description': organization.description,
+                'category': organization.category,
+                'updated_at': organization.updated_at
             }), 200)
         
     def patch(self, id):
@@ -251,6 +255,7 @@ class AdminOrganizationByID(Resource):
             'image_url': organization.image_url,
             'approval_status': organization.approval_status,
             'description': organization.description,
+            'category': organization.category
         }}, 200
     
     def delete(self, id):
@@ -277,6 +282,7 @@ class DonorOrganizations(Resource):
                     'image_url': organization.image_url,
                     'approval_status': organization.approval_status,
                     'description': organization.description,
+                    'category': organization.category
                 })
             if orgs:
                 return make_response(jsonify(orgs), 200)
@@ -299,6 +305,7 @@ class DonorOrganizationByID(Resource):
                 'image_url': organization.image_url,
                 'approval_status': organization.approval_status,
                 'description': organization.description,
+                'category': organization.category
             }), 200)
         
 
@@ -360,6 +367,7 @@ class OrganizationDashboard(Resource):
             'description': org.description,
             'image_url': org.image_url,
             'registered_on': org.created_at,
+            'category': org.category,
             'application_reviewed_on': org.updated_at
             }
         return make_response(org_dict, 200)
@@ -383,6 +391,7 @@ class SetUpOrganizationDetails(Resource):
             'email': organization.email,
             'image_url': organization.image_url,
             'approval_status': organization.approval_status,
+            'category': organization.category,
             'description': organization.description,
         }}, 200
 

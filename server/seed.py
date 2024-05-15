@@ -1,3 +1,5 @@
+import random
+
 from models import db, User, Organization, Donation, Story, Beneficiary
 from app import app
 from faker import Faker
@@ -29,6 +31,8 @@ with app.app_context():
     print('Admin Created')
 
     # Populate Organization Table
+
+    # categories = ['Air', 'Soil', 'Water']
 
     for x in range(10):
         organization = Organization(name=fake.company(), email=fake.company_email())
