@@ -180,6 +180,8 @@ class CheckSession(Resource):
                 'approval_status': org.approval_status,
                 'email': org.email,
                 'description': org.description,
+                'category': org.category,
+                'history': org.history,
                 'image_url': org.image_url,
                 'registered_on': org.created_at,
                 'application_reviewed_on': org.updated_at
@@ -208,6 +210,7 @@ class AdminOrganizations(Resource):
                     'image_url': organization.image_url,
                     'approval_status': organization.approval_status,
                     'description': organization.description,
+                    'history': organization.history,
                     'category': organization.category,
                     'updated_at': organization.updated_at
                 })
@@ -234,6 +237,7 @@ class AdminOrganizationByID(Resource):
                 'approval_status': organization.approval_status,
                 'description': organization.description,
                 'category': organization.category,
+                'history': organization.history,
                 'updated_at': organization.updated_at
             }), 200)
         
@@ -255,6 +259,7 @@ class AdminOrganizationByID(Resource):
             'image_url': organization.image_url,
             'approval_status': organization.approval_status,
             'description': organization.description,
+            'history': organization.history,
             'category': organization.category
         }}, 200
     
@@ -282,6 +287,7 @@ class DonorOrganizations(Resource):
                     'image_url': organization.image_url,
                     'approval_status': organization.approval_status,
                     'description': organization.description,
+                    'history': organization.history,
                     'category': organization.category
                 })
             if orgs:
@@ -305,7 +311,8 @@ class DonorOrganizationByID(Resource):
                 'image_url': organization.image_url,
                 'approval_status': organization.approval_status,
                 'description': organization.description,
-                'category': organization.category
+                'history': organization.history,
+                'category': organization.category,
             }), 200)
         
 
@@ -368,6 +375,7 @@ class OrganizationDashboard(Resource):
             'image_url': org.image_url,
             'registered_on': org.created_at,
             'category': org.category,
+            'history': org.history,
             'application_reviewed_on': org.updated_at
             }
         return make_response(org_dict, 200)
@@ -393,6 +401,7 @@ class SetUpOrganizationDetails(Resource):
             'approval_status': organization.approval_status,
             'category': organization.category,
             'description': organization.description,
+            'history': organization.history
         }}, 200
 
 class OrganizationDonations(Resource):
@@ -426,17 +435,24 @@ class OrganizationCreateStories(Resource):
             title=request.json['title'],
             content=request.json['content'],
             image_url=request.json['image_url'],
+            beneficiary_id=request.json['beneficiary_id'],
             organization_id=session['user_id']
         )
         db.session.add(story)
         db.session.commit()
+
+        beneficiary = Beneficiary.query.get(story.beneficiary_id)
+
         return make_response(jsonify({
             'id': story.id,
             'title': story.title,
             'content': story.content,
             'image_url': story.image_url,
             'organization_id': story.organization_id,
-            'created_at': story.created_at
+            'created_at': story.created_at,
+            'beneficary_name': beneficiary.name,
+            'beneficary_image': beneficiary.image_url,
+            'beneficary_amount': beneficiary.recieved_amount
         }), 200)
     
 class OrgCreateBeneficiary(Resource):
@@ -483,7 +499,7 @@ class OrgCreateBeneficiary(Resource):
 api.add_resource(RegisterUser, '/register', endpoint='register_user')
 api.add_resource(UserLogin, '/login', endpoint='login')
 api.add_resource(OrganizationLogin, '/org/login', endpoint='organization_login')
-api.add_resource(CheckSession, '/check_session', endpoint='checksession')  
+api.add_resource(CheckSession, '/checksession', endpoint='checksession')  
 api.add_resource(Logout, '/logout', endpoint='logout')
 api.add_resource(AdminOrganizations, '/admin', endpoint='admin_organizations')
 api.add_resource(AdminOrganizationByID, '/admin/<int:id>', endpoint='admin_organizations_by_id')
