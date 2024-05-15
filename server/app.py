@@ -210,7 +210,7 @@ class AdminOrganizations(Resource):
                     'description': organization.description,
                 })
             if orgs:
-                return make_response(jsonify({'message': 'success', 'data': orgs}), 200)
+                return make_response(jsonify(orgs), 200)
             else:
                 return make_response(jsonify({'message': 'No Organizations Found'}), 404)
         except Exception as e:
@@ -403,9 +403,9 @@ class OrganizationDonations(Resource):
                     'donor_last_name': user.last_name
                 })
             if donations:
-                return make_response(jsonify({'message': 'success', 'data': donations}), 200)
+                return make_response(jsonify(donations), 200)
             else:
-                return make_response(jsonify({'message': 'No Organizations Found'}), 404)
+                return make_response(jsonify({'message': 'No Donations Found'}), 404)
         except Exception as e:
             return make_response(jsonify({'message': 'An error occurred', 'error': str(e)}), 500)
         
@@ -445,7 +445,7 @@ class OrgCreateBeneficiary(Resource):
                     'image_url': beneficiary.image_url
                 })
             if beneficiaries:
-                return make_response(jsonify({'message': 'success', 'data': beneficiaries}), 200)
+                return make_response(jsonify(beneficiaries), 200)
             else:
                 return make_response(jsonify({'message': 'No Organizations Found'}), 404)
         except Exception as e:
