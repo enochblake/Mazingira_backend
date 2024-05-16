@@ -3,8 +3,8 @@ import os
 from flask import Flask, make_response, jsonify, request, session, redirect
 from flask_cors import CORS
 from flask_migrate import Migrate
-from flask_restful import Api, Resource
-from models import db, Organization , User, Donation, Story, Beneficiary
+from flask_restful import Api, Resource,reqparse
+from models import db, Organization , User, Donation, Story, Beneficiary,Contact
 
 app = Flask(__name__)
 CORS(app)
