@@ -7,7 +7,8 @@ from flask_restful import Api, Resource
 from models import db, Organization , User, Donation, Story, Beneficiary
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+# CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+CORS(app, origins=["http://localhost:3000"])
 
 
 app.secret_key = b'Y\xf1Xz\x00\xad|eQ\x80t \xca\x1a\x10K'
@@ -140,7 +141,14 @@ class RegisterOrganization(Resource):
                 org_dict = {
                 'id': org.id,
                 'name': org.name,
-                'email': org.email
+                'approval_status': org.approval_status,
+                'email': org.email,
+                'description': org.description,
+                'category': org.category,
+                'history': org.history,
+                'image_url': org.image_url,
+                'registered_on': org.created_at,
+                'application_reviewed_on': org.updated_at
                 }
                 return make_response(org_dict, 200)
                 # return redirect('/organization')
@@ -162,7 +170,20 @@ class OrganizationLogin(Resource):
                 # print(user.authenticate(password))
                 session['user_id'] = org.id
                 session['user_role'] = org.role
-                return redirect('/organization')
+                org_dict = {
+                'id': org.id,
+                'name': org.name,
+                'approval_status': org.approval_status,
+                'email': org.email,
+                'description': org.description,
+                'category': org.category,
+                'history': org.history,
+                'image_url': org.image_url,
+                'registered_on': org.created_at,
+                'application_reviewed_on': org.updated_at
+                }
+                return make_response(org_dict, 200)
+                # return redirect('/organization')
             else:
                 return make_response({'error': 'Invalid username or password'}, 401)
 class CheckSession(Resource):
