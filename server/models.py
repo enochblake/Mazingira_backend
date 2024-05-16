@@ -108,6 +108,7 @@ class Story(db.Model, SerializerMixin):
     content = db.Column(db.Text, nullable=False)
     image_url = db.Column(db.String, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
+    time_to_read = db.Column(db.Integer)
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
     beneficiary_id = db.Column(db.Integer, db.ForeignKey('beneficiaries.id'))
 
