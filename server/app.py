@@ -25,26 +25,26 @@ db.init_app(app)
 
 api = Api(app)
 
-@app.before_request
-def check_if_logged_in():
-    allowed_admin_endpoints = ['logout','admin_organizations', 'admin_organizations_by_id', 'checksession' ]
-    allowed_donor_endpoints = ['logout','donor_organizations', 'donor_organization_by_id', 'donate', 'beneficiaries_stories', 'checksession']
-    allowed_organization_endpoints = ['logout','organization_dashboard', 'set_up_organization_details', 'non_anonymous_donations', 'create_post', 'create_beneficiary', 'checksession']
+# @app.before_request
+# def check_if_logged_in():
+#     allowed_admin_endpoints = ['logout','admin_organizations', 'admin_organizations_by_id', 'checksession' ]
+#     allowed_donor_endpoints = ['logout','donor_organizations', 'donor_organization_by_id', 'donate', 'beneficiaries_stories', 'checksession']
+#     allowed_organization_endpoints = ['logout','organization_dashboard', 'set_up_organization_details', 'non_anonymous_donations', 'create_post', 'create_beneficiary', 'checksession']
 
-    if session.get('user_id'):
-        if session.get('user_role') == 'donor':
-            if request.endpoint not in allowed_donor_endpoints:
-                return {'error': 'Unauthorized To Access This Resource'}, 401
-        elif session.get('user_role') == 'admin':
-            if request.endpoint not in allowed_admin_endpoints:
-                return {'error': 'Unauthorized To Access This Resource'}, 401
-        # elif session.get('user_role') == 'org':
-        else:
-            if request.endpoint not in allowed_organization_endpoints:
-                return {'error': 'Unauthorized To Access This Resource'}, 401
-    else:
-        if request.endpoint not in ['checksession','organization_login', 'login', 'home', 'register_user', 'register_organization']:
-            return {'error': 'Unauthorized Log In First'}, 401
+#     if session.get('user_id'):
+#         if session.get('user_role') == 'donor':
+#             if request.endpoint not in allowed_donor_endpoints:
+#                 return {'error': 'Unauthorized To Access This Resource'}, 401
+#         elif session.get('user_role') == 'admin':
+#             if request.endpoint not in allowed_admin_endpoints:
+#                 return {'error': 'Unauthorized To Access This Resource'}, 401
+#         # elif session.get('user_role') == 'org':
+#         else:
+#             if request.endpoint not in allowed_organization_endpoints:
+#                 return {'error': 'Unauthorized To Access This Resource'}, 401
+#     else:
+#         if request.endpoint not in ['checksession','organization_login', 'login', 'home', 'register_user', 'register_organization']:
+#             return {'error': 'Unauthorized Log In First'}, 401
 
 @app.route('/')
 def index():
