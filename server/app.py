@@ -7,11 +7,14 @@ from flask_restful import Api, Resource
 from models import db, Organization , User, Donation, Story, Beneficiary
 
 app = Flask(__name__)
-# CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
-CORS(app, origins=["http://localhost:3000"])
-
 
 app.secret_key = b'Y\xf1Xz\x00\xad|eQ\x80t \xca\x1a\x10K'
+
+# CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
+
+
+
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mazingira.db'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -437,6 +440,8 @@ class OrganizationDonations(Resource):
     def get(self):
         try:
             donations = []
+            print('Hmmmm4')
+            print(session)
             for donation in Donation.query.filter_by(organization_id = session['user_id']):
                 user = User.query.get(donation.donor_id)
                 donations.append({
