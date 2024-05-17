@@ -13,7 +13,8 @@ app.secret_key = b'Y\xf1Xz\x00\xad|eQ\x80t \xca\x1a\x10K'
 # CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
 
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # or 'Strict' or 'Lax'
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # or 'Strict' or 'Lax'
+app.config['SESSION_COOKIE_SECURE'] = True
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mazingira.db'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
