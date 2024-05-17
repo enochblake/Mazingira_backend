@@ -469,7 +469,7 @@ class OrganizationCreateStories(Resource):
             content=request.json['content'],
             image_url=request.json['image_url'],
             # beneficiary_id=request.json['beneficiary_id'],
-            time_to_read=request.json['time_to_read'],
+            # time_to_read=request.json['time_to_read'],
             organization_id=session['user_id']
         )
         db.session.add(story)
