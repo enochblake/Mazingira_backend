@@ -468,14 +468,14 @@ class OrganizationCreateStories(Resource):
             title=request.json['title'],
             content=request.json['content'],
             image_url=request.json['image_url'],
-            beneficiary_id=request.json['beneficiary_id'],
+            # beneficiary_id=request.json['beneficiary_id'],
             time_to_read=request.json['time_to_read'],
             organization_id=session['user_id']
         )
         db.session.add(story)
         db.session.commit()
 
-        beneficiary = Beneficiary.query.get(story.beneficiary_id)
+        # beneficiary = Beneficiary.query.get(story.beneficiary_id)
 
         return make_response(jsonify({
             'id': story.id,
@@ -485,9 +485,9 @@ class OrganizationCreateStories(Resource):
             'time_to_read':story.time_to_read,
             'organization_id': story.organization_id,
             'created_at': story.created_at,
-            'beneficary_name': beneficiary.name,
-            'beneficary_image': beneficiary.image_url,
-            'beneficary_amount': beneficiary.recieved_amount
+            # 'beneficary_name': beneficiary.name,
+            # 'beneficary_image': beneficiary.image_url,
+            # 'beneficary_amount': beneficiary.recieved_amount
         }), 200)
     
 class OrgCreateBeneficiary(Resource):

@@ -92,6 +92,7 @@ class Beneficiary(db.Model, SerializerMixin):
     name = db.Column(db.String, nullable=False)
     recieved_amount = db.Column(db.Float, nullable=False)
     image_url = db.Column(db.String)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
     
     stories = db.relationship('Story', backref='beneficiary')    
