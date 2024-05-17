@@ -13,7 +13,7 @@ app.secret_key = b'Y\xf1Xz\x00\xad|eQ\x80t \xca\x1a\x10K'
 # CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
 
-
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # or 'Strict' or 'Lax'
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mazingira.db'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
@@ -512,10 +512,10 @@ class OrgCreateBeneficiary(Resource):
             return make_response(jsonify({'message': 'An error occurred', 'error': str(e)}), 500)
 
     def post(self):
-        
+        print(session)
         beneficiary = Beneficiary(
             name=request.json['name'],
-            recieved_amount=request.json['recieved_amount'],
+            recieved_amount=request.json['received_amount'],
             image_url=request.json['image_url'],
             organization_id=session['user_id']
         )
