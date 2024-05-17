@@ -481,16 +481,18 @@ class OrgCreateBeneficiary(Resource):
 class ContactResource(Resource):
     def post(self):
         parser = reqparse.RequestParser()
+        parser.add_argument('first_name', type=str, required=True, help='Name is required')
+        parser.add_argument('last_name', type=str, required=True, help='Name is required')
         parser.add_argument('email', type=str, required=True, help='Email is required')
-        parser.add_argument('name', type=str, required=True, help='Name is required')
         parser.add_argument('message', type=str, required=True, help='Message is required')
         args = parser.parse_args()
 
+        first_name = args['first_name']
+        last_name = args['last_name']
         email = args['email']
-        name = args['name']
         message = args['message']
 
-        new_contact = Contact(email=email, name=name, message=message)
+        new_contact = Contact(first_name=first_name,last_name=last_name,email=email, message=message)
 
         try:
             db.session.add(new_contact)
