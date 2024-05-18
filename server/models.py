@@ -52,6 +52,7 @@ class Organization(db.Model, SerializerMixin):
     approval_status = db.Column(db.Boolean, default=False)
     category = db.Column(db.String)
     description = db.Column(db.String)
+    history = db.Column(db.String)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
     password_hash = db.Column(db.String, nullable=False)
@@ -91,6 +92,7 @@ class Beneficiary(db.Model, SerializerMixin):
     name = db.Column(db.String, nullable=False)
     recieved_amount = db.Column(db.Float, nullable=False)
     image_url = db.Column(db.String)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
     
     stories = db.relationship('Story', backref='beneficiary')    
@@ -107,11 +109,13 @@ class Story(db.Model, SerializerMixin):
     content = db.Column(db.Text, nullable=False)
     image_url = db.Column(db.String, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
+    time_to_read = db.Column(db.Integer)
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
     beneficiary_id = db.Column(db.Integer, db.ForeignKey('beneficiaries.id'))
 
     def __repr__(self):
         return f'<Story: Id: {self.id}, Title: {self.title} Created At:{self.created_at}>'
+
 class Contact(db.Model):
     __tablename__ = 'contacts'
 

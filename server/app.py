@@ -7,12 +7,16 @@ from flask_restful import Api, Resource,reqparse
 from models import db, Organization , User, Donation, Story, Beneficiary,Contact
 
 app = Flask(__name__)
-CORS(app)
-
 
 app.secret_key = b'Y\xf1Xz\x00\xad|eQ\x80t \xca\x1a\x10K'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mazingira.db'
-# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
+
+# CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
+
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # or 'Strict' or 'Lax'
+app.config['SESSION_COOKIE_SECURE'] = True
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mazingira.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
 app.json.compact = False
@@ -137,7 +141,20 @@ class RegisterOrganization(Resource):
             if org and org.authenticate(password) == True:
                 session['user_id'] = org.id
                 session['user_role'] = org.role
-                return redirect('/organization')
+                org_dict = {
+                'id': org.id,
+                'name': org.name,
+                'approval_status': org.approval_status,
+                'email': org.email,
+                'description': org.description,
+                'category': org.category,
+                'history': org.history,
+                'image_url': org.image_url,
+                'registered_on': org.created_at,
+                'application_reviewed_on': org.updated_at
+                }
+                return make_response(org_dict, 200)
+                # return redirect('/organization')
             else:
                 return make_response({'error': 'Invalid username or password'}, 401)
         else:
@@ -156,7 +173,21 @@ class OrganizationLogin(Resource):
                 # print(user.authenticate(password))
                 session['user_id'] = org.id
                 session['user_role'] = org.role
-                return redirect('/organization')
+                org_dict = {
+                'id': org.id,
+                'name': org.name,
+                'approval_status': org.approval_status,
+                'email': org.email,
+                'description': org.description,
+                'category': org.category,
+                'history': org.history,
+                'image_url': org.image_url,
+                'registered_on': org.created_at,
+                'application_reviewed_on': org.updated_at
+                }
+                return make_response(org_dict, 200)
+                # return redirect('/organization')
+
             else:
                 return make_response({'error': 'Invalid username or password'}, 401)
 class CheckSession(Resource):
@@ -180,6 +211,8 @@ class CheckSession(Resource):
                 'approval_status': org.approval_status,
                 'email': org.email,
                 'description': org.description,
+                'category': org.category,
+                'history': org.history,
                 'image_url': org.image_url,
                 'registered_on': org.created_at,
                 'application_reviewed_on': org.updated_at
@@ -207,7 +240,8 @@ class AdminOrganizations(Resource):
                     'email': organization.email,
                     'image_url': organization.image_url,
                     'approval_status': organization.approval_status,
-                    'description': organization.description,
+                    'description': organization.description
+                    'history': organization.history,
                     'category': organization.category,
                     'updated_at': organization.updated_at
                 })
@@ -234,6 +268,7 @@ class AdminOrganizationByID(Resource):
                 'approval_status': organization.approval_status,
                 'description': organization.description,
                 'category': organization.category,
+                'history': organization.history,
                 'updated_at': organization.updated_at
             }), 200)
         
@@ -255,6 +290,7 @@ class AdminOrganizationByID(Resource):
             'image_url': organization.image_url,
             'approval_status': organization.approval_status,
             'description': organization.description,
+            'history': organization.history,
             'category': organization.category
         }}, 200
     
@@ -279,9 +315,10 @@ class DonorOrganizations(Resource):
                     'id': organization.id,
                     'name': organization.name,
                     'email': organization.email,
-                    'image_url': organization.image_url,
+                    'logo': organization.image_url,
                     'approval_status': organization.approval_status,
                     'description': organization.description,
+                    'history': organization.history,
                     'category': organization.category
                 })
             if orgs:
@@ -302,10 +339,11 @@ class DonorOrganizationByID(Resource):
                 'id': organization.id,
                 'name': organization.name,
                 'email': organization.email,
-                'image_url': organization.image_url,
+                'logo': organization.image_url,
                 'approval_status': organization.approval_status,
                 'description': organization.description,
-                'category': organization.category
+                'history': organization.history,
+                'category': organization.category,
             }), 200)
         
 
@@ -340,11 +378,12 @@ class BeneficiariesStories(Resource):
                     'title': story.title,
                     'content': story.content,
                     'image_url': story.image_url,
+                    'time_to_read': story.time_to_read,
                     'created_at': story.created_at,
                     'organization_id': story.organization_id,
                 })
             if stories:
-                return make_response(jsonify({'message': 'success', 'data': stories}), 200)
+                return make_response(jsonify(stories), 200)
             else:
                 return make_response(jsonify({'message': 'No Stories Found. Make A Donation First'}), 404)
         except Exception as e:
@@ -368,6 +407,7 @@ class OrganizationDashboard(Resource):
             'image_url': org.image_url,
             'registered_on': org.created_at,
             'category': org.category,
+            'history': org.history,
             'application_reviewed_on': org.updated_at
             }
         return make_response(org_dict, 200)
@@ -393,6 +433,7 @@ class SetUpOrganizationDetails(Resource):
             'approval_status': organization.approval_status,
             'category': organization.category,
             'description': organization.description,
+            'history': organization.history
         }}, 200
 
 class OrganizationDonations(Resource):
@@ -400,6 +441,8 @@ class OrganizationDonations(Resource):
     def get(self):
         try:
             donations = []
+            print('Hmmmm4')
+            print(session)
             for donation in Donation.query.filter_by(organization_id = session['user_id']):
                 user = User.query.get(donation.donor_id)
                 donations.append({
@@ -426,17 +469,26 @@ class OrganizationCreateStories(Resource):
             title=request.json['title'],
             content=request.json['content'],
             image_url=request.json['image_url'],
+            # beneficiary_id=request.json['beneficiary_id'],
+            # time_to_read=request.json['time_to_read'],
             organization_id=session['user_id']
         )
         db.session.add(story)
         db.session.commit()
+        
+        # beneficiary = Beneficiary.query.get(story.beneficiary_id)
+        
         return make_response(jsonify({
             'id': story.id,
             'title': story.title,
             'content': story.content,
             'image_url': story.image_url,
+            'time_to_read':story.time_to_read,
             'organization_id': story.organization_id,
-            'created_at': story.created_at
+            'created_at': story.created_at,
+            # 'beneficary_name': beneficiary.name,
+            # 'beneficary_image': beneficiary.image_url,
+            # 'beneficary_amount': beneficiary.recieved_amount
         }), 200)
     
 class OrgCreateBeneficiary(Resource):
@@ -461,10 +513,10 @@ class OrgCreateBeneficiary(Resource):
             return make_response(jsonify({'message': 'An error occurred', 'error': str(e)}), 500)
 
     def post(self):
-        
+        print(session)
         beneficiary = Beneficiary(
             name=request.json['name'],
-            recieved_amount=request.json['recieved_amount'],
+            recieved_amount=request.json['received_amount'],
             image_url=request.json['image_url'],
             organization_id=session['user_id']
         )
@@ -508,7 +560,7 @@ class ContactResource(Resource):
 api.add_resource(RegisterUser, '/register', endpoint='register_user')
 api.add_resource(UserLogin, '/login', endpoint='login')
 api.add_resource(OrganizationLogin, '/org/login', endpoint='organization_login')
-api.add_resource(CheckSession, '/check_session', endpoint='checksession')  
+api.add_resource(CheckSession, '/checksession', endpoint='checksession')  
 api.add_resource(Logout, '/logout', endpoint='logout')
 api.add_resource(AdminOrganizations, '/admin', endpoint='admin_organizations')
 api.add_resource(AdminOrganizationByID, '/admin/<int:id>', endpoint='admin_organizations_by_id')
@@ -522,7 +574,6 @@ api.add_resource(DonorOrganizations, '/donor/organization', endpoint='donor_orga
 api.add_resource(DonorOrganizationByID, '/donor/organization/<int:id>', endpoint='donor_organization_by_id')
 api.add_resource(Donate, '/donate', endpoint='donate')
 api.add_resource(BeneficiariesStories, '/donor/stories', endpoint='beneficiaries_stories')
-
 api.add_resource(ContactResource, '/submit_contact_form')
 
 
