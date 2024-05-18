@@ -240,7 +240,7 @@ class AdminOrganizations(Resource):
                     'email': organization.email,
                     'image_url': organization.image_url,
                     'approval_status': organization.approval_status,
-                    'description': organization.description
+                    'description': organization.description,
                     'history': organization.history,
                     'category': organization.category,
                     'updated_at': organization.updated_at
