@@ -41,14 +41,12 @@ with app.app_context():
 
     # Populate Organization Table
 
-
     for x in range(20):
         organization = Organization(name=fake.company(),approval_status=random.choice(approval_status) , email=fake.company_email(), category=random.choice(categories), description=fake.sentence(nb_words=5), history=history, image_url='https://thumbs.dreamstime.com/b/hands-child-holding-young-plants-back-soil-nature-park-growth-plant-hands-child-holding-young-plants-111399665.jpg')
         organization.set_password(fake.name())
         db.session.add(organization)
         db.session.commit()
     print('Organizations Created')
-
 
     # Populate Donation Table
 
@@ -69,7 +67,6 @@ with app.app_context():
     # https://i.pinimg.com/originals/63/f9/d5/63f9d5fd5f34c8544a31c22c3e909cec.jpg
 
     # Populate Story Table
-    
     for x in range(40):
         story = Story(title=fake.name(), content=fake.paragraph(nb_sentences=6),image_url="https://i.pinimg.com/originals/63/f9/d5/63f9d5fd5f34c8544a31c22c3e909cec.jpg", organization_id=fake.random_int(min=1, max=10), beneficiary_id=fake.random_int(min=1, max=10))
         db.session.add(story)

@@ -3,8 +3,8 @@ import os
 from flask import Flask, make_response, jsonify, request, session, redirect
 from flask_cors import CORS
 from flask_migrate import Migrate
-from flask_restful import Api, Resource
-from models import db, Organization , User, Donation, Story, Beneficiary
+from flask_restful import Api, Resource,reqparse
+from models import db, Organization , User, Donation, Story, Beneficiary,Contact
 
 app = Flask(__name__)
 
@@ -15,7 +15,6 @@ CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
 
 app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # or 'Strict' or 'Lax'
 app.config['SESSION_COOKIE_SECURE'] = True
-
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mazingira.db'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -188,6 +187,7 @@ class OrganizationLogin(Resource):
                 }
                 return make_response(org_dict, 200)
                 # return redirect('/organization')
+
             else:
                 return make_response({'error': 'Invalid username or password'}, 401)
 class CheckSession(Resource):
@@ -240,7 +240,7 @@ class AdminOrganizations(Resource):
                     'email': organization.email,
                     'image_url': organization.image_url,
                     'approval_status': organization.approval_status,
-                    'description': organization.description,
+                    'description': organization.description
                     'history': organization.history,
                     'category': organization.category,
                     'updated_at': organization.updated_at
@@ -475,9 +475,9 @@ class OrganizationCreateStories(Resource):
         )
         db.session.add(story)
         db.session.commit()
-
+        
         # beneficiary = Beneficiary.query.get(story.beneficiary_id)
-
+        
         return make_response(jsonify({
             'id': story.id,
             'title': story.title,
@@ -529,6 +529,31 @@ class OrgCreateBeneficiary(Resource):
             'image_url': beneficiary.image_url,
             'organization_id': beneficiary.organization_id
         }), 200)
+        
+class ContactResource(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('first_name', type=str, required=True, help='Name is required')
+        parser.add_argument('last_name', type=str, required=True, help='Name is required')
+        parser.add_argument('email', type=str, required=True, help='Email is required')
+        parser.add_argument('message', type=str, required=True, help='Message is required')
+        args = parser.parse_args()
+
+        first_name = args['first_name']
+        last_name = args['last_name']
+        email = args['email']
+        message = args['message']
+
+        new_contact = Contact(first_name=first_name,last_name=last_name,email=email, message=message)
+
+        try:
+            db.session.add(new_contact)
+            db.session.commit()
+            return {'message': 'Contact form submitted successfully'}, 201
+        except Exception as e:
+            db.session.rollback()
+            return {'error': str(e)}, 500
+
 
 
 # EndPoints
@@ -549,6 +574,8 @@ api.add_resource(DonorOrganizations, '/donor/organization', endpoint='donor_orga
 api.add_resource(DonorOrganizationByID, '/donor/organization/<int:id>', endpoint='donor_organization_by_id')
 api.add_resource(Donate, '/donate', endpoint='donate')
 api.add_resource(BeneficiariesStories, '/donor/stories', endpoint='beneficiaries_stories')
+api.add_resource(ContactResource, '/submit_contact_form')
+
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

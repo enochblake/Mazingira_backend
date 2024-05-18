@@ -115,7 +115,7 @@ class Story(db.Model, SerializerMixin):
 
     def __repr__(self):
         return f'<Story: Id: {self.id}, Title: {self.title} Created At:{self.created_at}>'
-    
+
 class Contact(db.Model):
     __tablename__ = 'contacts'
 
