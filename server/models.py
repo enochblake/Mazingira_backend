@@ -115,3 +115,16 @@ class Story(db.Model, SerializerMixin):
 
     def __repr__(self):
         return f'<Story: Id: {self.id}, Title: {self.title} Created At:{self.created_at}>'
+    
+class Contact(db.Model):
+    __tablename__ = 'contacts'
+
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String, nullable=False)
+    last_name = db.Column(db.String, nullable=False)
+    email = db.Column(db.String, nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+    def __repr__(self):
+        return f'<Contact: Id: {self.id}, Email: {self.email}, Name: {self.name}, Created At: {self.created_at}>'
