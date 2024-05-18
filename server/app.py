@@ -223,9 +223,10 @@ class CheckSession(Resource):
 class Logout(Resource):
 
     def delete(self):
-        session['user_id'] = None
-        session['user_role'] = None
-        return {'message': '204: No Content'}, 204
+        session.clear()
+        response= make_response({'message': '204: No Content'}, 204)
+        response.set_cookie('session', '', expires=0)
+        return response
 
 # Admin Endpoints
 
