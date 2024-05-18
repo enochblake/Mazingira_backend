@@ -201,6 +201,7 @@ class CheckSession(Resource):
                 'last_name': user.last_name,
                 'email': user.email,
                 'role': user.role,
+                'authenticated': True
                 }
             return make_response(user_dict, 200)
         elif session.get('user_id') and session['user_role'] == 'org':
@@ -215,11 +216,12 @@ class CheckSession(Resource):
                 'history': org.history,
                 'image_url': org.image_url,
                 'registered_on': org.created_at,
-                'application_reviewed_on': org.updated_at
+                'application_reviewed_on': org.updated_at,
+                'authenticated': True
                 }
             return make_response(org_dict, 200)
         else:
-            return {'message': 'Log In To Access Resource or Contact Mazingira'}, 401
+            return {'authenticated': True}, 401
 class Logout(Resource):
 
     def delete(self):
