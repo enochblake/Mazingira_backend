@@ -1,5 +1,13 @@
 # Mazingira Backend
 
+## STARTING MAZINGIRA
+
+- Clone the repository
+- Change the directory `cd Mazingira_backend` and run the following commands
+1. `pipenv install && pipenv  shell`
+2. `cd server`
+3. `export DATABASE_URI=postgresql://mazingira_database_wh0g_user:5GOoLvoe35AT7FjoRiviUUvG72uIpeUc@dpg-cp1oatmct0pc73d59v00-a.frankfurt-postgres.render.com/mazingira_db`
+4. `python app.py`
 
 ## ENDPOINTS
 
