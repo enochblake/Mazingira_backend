@@ -69,18 +69,18 @@ class UserLogin(Resource):
                 # print(user.authenticate(password))
                 session['user_id'] = user.id
                 session['user_role'] = user.role
-                # user_dict = {
-                # 'id': user.id,
-                # 'first_name': user.first_name,
-                # 'last_name': user.last_name,
-                # 'email': user.email,
-                # 'role': user.role,
-                # }
-                # return make_response(user_dict, 200)
-                if user.role == 'donor':
-                    return redirect('donor/organization')
-                else:
-                    return redirect('/admin')
+                user_dict = {
+                'id': user.id,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'email': user.email,
+                'role': user.role,
+                }
+                return make_response(user_dict, 200)
+                # if user.role == 'donor':
+                #     return redirect('donor/organization')
+                # else:
+                #     return redirect('/admin')
             else:
                 return make_response({'error': 'Invalid username or password'}, 401)
 
@@ -176,6 +176,7 @@ class OrganizationLogin(Resource):
                 org_dict = {
                 'id': org.id,
                 'name': org.name,
+                'role': org.role,
                 'approval_status': org.approval_status,
                 'email': org.email,
                 'description': org.description,
@@ -218,7 +219,8 @@ class CheckSession(Resource):
                 'image_url': org.image_url,
                 'registered_on': org.created_at,
                 'application_reviewed_on': org.updated_at,
-                'authenticated': True
+                'authenticated': True,
+                'role': org.role
                 }
             return make_response(org_dict, 200)
         else:
