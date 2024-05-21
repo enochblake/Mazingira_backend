@@ -194,6 +194,7 @@ class CheckSession(Resource):
 
     def get(self):
         if session.get('user_id') and session['user_role'] != 'org':
+            print(session)
             user = User.query.filter(User.id == session.get('user_id')).first()
             user_dict = {
                 'id': user.id,
@@ -221,7 +222,7 @@ class CheckSession(Resource):
                 }
             return make_response(org_dict, 200)
         else:
-            return {'authenticated': True}, 401
+            return {'authenticated': False}, 401
 class Logout(Resource):
 
     def delete(self):
@@ -233,7 +234,12 @@ class Logout(Resource):
 # Admin Endpoints
 
 class AdminOrganizations(Resource):
+    
     def get(self):
+
+        print(session)
+        print('All Orgs')
+        
         try:
             orgs = []
             for organization in Organization.query.all():
@@ -259,6 +265,9 @@ class AdminOrganizationByID(Resource):
 
     # View One Organization as the Admin
     def get(self, id):
+        print(session)
+        print('One Orgs')
+
         organization = Organization.query.filter(Organization.id == id).first()
         if organization is None:
             return make_response(jsonify({'message': 'The requested Organization does not exist'}), 404)
@@ -276,7 +285,7 @@ class AdminOrganizationByID(Resource):
             }), 200)
         
     def patch(self, id):
-        # Approve/Update an existing Organization
+        # Approve/Update an existing Organization    
 
         organization = Organization.query.filter(Organization.id == id).first()
         if not organization:
@@ -298,7 +307,10 @@ class AdminOrganizationByID(Resource):
         }}, 200
     
     def delete(self, id):
+        print(session)
+        print('Deleted Orgs')
         organization = Organization.query.filter_by(id=id).first()
+        print(organization)
         if organization:
             db.session.delete(organization)
             db.session.commit()
@@ -506,7 +518,8 @@ class OrgCreateBeneficiary(Resource):
                     'name': beneficiary.name,
                     'recieved_amount': beneficiary.recieved_amount,
                     'organization_id': beneficiary.organization_id,
-                    'image_url': beneficiary.image_url
+                    'image_url': beneficiary.image_url,
+                    'created_at': beneficiary.created_at
                 })
             if beneficiaries:
                 return make_response(jsonify(beneficiaries), 200)

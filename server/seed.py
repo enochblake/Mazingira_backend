@@ -23,6 +23,8 @@ with app.app_context():
     # print('Deleted Organizations')
     # User.query.delete()
     # print('Deleted Users')
+    Story.query.delete()
+    print('Deleted Stories')
 
     # # Populate User Table
 
@@ -68,10 +70,10 @@ with app.app_context():
 
     # Populate Story Table
 
-    # for x in range(40):
-    #     story = Story(title=fake.name(), content=fake.paragraph(nb_sentences=8),image_url="https://i.pinimg.com/originals/63/f9/d5/63f9d5fd5f34c8544a31c22c3e909cec.jpg", organization_id=21, beneficiary_id=fake.random_int(min=101, max=150))
-    #     db.session.add(story)
-    #     db.session.commit()
-    # print('Stories Created')
+    for x in range(40):
+        story = Story(title=fake.name(), content=fake.paragraph(nb_sentences=8), image_url="https://i.pinimg.com/originals/63/f9/d5/63f9d5fd5f34c8544a31c22c3e909cec.jpg", organization_id=21, time_to_read=fake.random_int(min=3, max=6), beneficiary_id=fake.random_int(min=101, max=150))
+        db.session.add(story)
+        db.session.commit()
+    print('Stories Created')
 
     print('Completed!!')
