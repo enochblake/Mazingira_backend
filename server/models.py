@@ -128,3 +128,14 @@ class Contact(db.Model):
 
     def __repr__(self):
         return f'<Contact: Id: {self.id}, Email: {self.email}, Name: {self.name}, Created At: {self.created_at}>'
+
+class AdminNotification(db.Model):
+    __tablename__ = 'adminNotifications'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    message = db.Column(db.String(255), nullable=False)
+    date_created = db.Column(db.DateTime, server_default=db.func.now())
+    is_read = db.Column(db.Boolean, default=False)
+
+    def __repr__(self):
+        return f'<AdminNotification {self.message}>'

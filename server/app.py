@@ -4,7 +4,7 @@ from flask import Flask, make_response, jsonify, request, session, redirect
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_restful import Api, Resource,reqparse
-from models import db, Organization , User, Donation, Story, Beneficiary,Contact
+from models import db, Organization , User, Donation, Story, Beneficiary,Contact,AdminNotification
 
 app = Flask(__name__)
 
@@ -121,10 +121,48 @@ class RegisterUser(Resource):
             return make_response({'message': 'All fields have to be filled'}, 401)
 
 
+# class RegisterOrganization(Resource):
+
+#     def post(self):
+
+#         data = request.get_json()
+#         if data:
+#             name = request.get_json()['name']
+#             email = request.get_json()['email']
+#             password = request.get_json()['password']
+
+#             new_org = Organization(name=name, email=email)
+#             new_org.set_password(password)
+#             db.session.add(new_org)
+#             db.session.commit()
+
+#             org = Organization.query.filter(Organization.email == email).first()
+
+#             if org and org.authenticate(password) == True:
+#                 session['user_id'] = org.id
+#                 session['user_role'] = org.role
+#                 org_dict = {
+#                 'id': org.id,
+#                 'name': org.name,
+#                 'approval_status': org.approval_status,
+#                 'email': org.email,
+#                 'description': org.description,
+#                 'category': org.category,
+#                 'history': org.history,
+#                 'image_url': org.image_url,
+#                 'registered_on': org.created_at,
+#                 'application_reviewed_on': org.updated_at
+#                 }
+#                 return make_response(org_dict, 200)
+#                 # return redirect('/organization')
+#             else:
+#                 return make_response({'error': 'Invalid username or password'}, 401)
+#         else:
+#             return make_response({'message': 'All fields have to be filled'}, 401)
+
+
 class RegisterOrganization(Resource):
-
     def post(self):
-
         data = request.get_json()
         if data:
             name = request.get_json()['name']
@@ -138,27 +176,34 @@ class RegisterOrganization(Resource):
 
             org = Organization.query.filter(Organization.email == email).first()
 
-            if org and org.authenticate(password) == True:
+            if org and org.authenticate(password):
                 session['user_id'] = org.id
                 session['user_role'] = org.role
                 org_dict = {
-                'id': org.id,
-                'name': org.name,
-                'approval_status': org.approval_status,
-                'email': org.email,
-                'description': org.description,
-                'category': org.category,
-                'history': org.history,
-                'image_url': org.image_url,
-                'registered_on': org.created_at,
-                'application_reviewed_on': org.updated_at
+                    'id': org.id,
+                    'name': org.name,
+                    'approval_status': org.approval_status,
+                    'email': org.email,
+                    'description': org.description,
+                    'category': org.category,
+                    'history': org.history,
+                    'image_url': org.image_url,
+                    'registered_on': org.created_at,
+                    'application_reviewed_on': org.updated_at
                 }
+
+                # Generate notification for admin about pending approval
+                message = f"New organization '{org.name}' has signed up and is pending approval."
+                new_notification = AdminNotification(message=message)
+                db.session.add(new_notification)
+                db.session.commit()
+
                 return make_response(org_dict, 200)
-                # return redirect('/organization')
             else:
                 return make_response({'error': 'Invalid username or password'}, 401)
         else:
             return make_response({'message': 'All fields have to be filled'}, 401)
+
 
 class OrganizationLogin(Resource):
 
@@ -571,7 +616,12 @@ class ContactResource(Resource):
         except Exception as e:
             db.session.rollback()
             return {'error': str(e)}, 500
-
+        
+class AdminNotification(Resource):
+    def get(self):
+        notifications = AdminNotification.query.filter_by(is_read=False).all()
+        notification_list = [{'id': n.id, 'message': n.message, 'date_created': n.date_created} for n in notifications]
+        return jsonify(notification_list)
 
 
 # EndPoints
@@ -593,6 +643,8 @@ api.add_resource(DonorOrganizationByID, '/donor/organization/<int:id>', endpoint
 api.add_resource(Donate, '/donate', endpoint='donate')
 api.add_resource(BeneficiariesStories, '/donor/stories', endpoint='beneficiaries_stories')
 api.add_resource(ContactResource, '/submit_contact_form')
+api.add_resource(AdminNotification, '/admin/notification')
+
 
 
 if __name__ == '__main__':

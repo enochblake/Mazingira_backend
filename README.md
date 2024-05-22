@@ -196,6 +196,22 @@ Deletes one organization whether approved or unapproved
 ```
 
 
+### GET /admin/notification
+Returns a list of notifications when a new organization sign up
+#### Request
+`GET /admin/notification`
+#### Response
+```json
+[
+        {
+            "id": 1,
+            "message": "New organization "Org1" has signed up and is pending approval.",
+            "date_created": "currebt time",
+            "is_read": false,
+        }
+    ]
+```
+
 ## DONOR ENDPOINTS
 
 ### GET /donor/organization
