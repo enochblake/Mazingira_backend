@@ -6,7 +6,7 @@
 - Change the directory `cd Mazingira_backend` and run the following commands
 1. `pipenv install && pipenv  shell`
 2. `cd server`
-3. `export DATABASE_URI=postgresql://mazingira_database_wh0g_user:5GOoLvoe35AT7FjoRiviUUvG72uIpeUc@dpg-cp1oatmct0pc73d59v00-a.frankfurt-postgres.render.com/mazingira_db`
+3. `export DATABASE_URI=postgresql://mazingira_user:ETf9S7HRc1cYbgOUSZGHfdNAEnGHAo3L@dpg-cp45l90cmk4c73eema9g-a.frankfurt-postgres.render.com/mazingira_db^C`
 4. `python app.py`
 
 ## ENDPOINTS
