@@ -5,7 +5,7 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_restful import Api, Resource,reqparse
 from flask_mail import Mail, Message
-from models import db, Organization , User, Donation, Story, Beneficiary,Contact,AdminNotification
+from models import db, Organization , User, Donation, Story, Beneficiary,Contact
 
 app = Flask(__name__)
 
@@ -318,7 +318,8 @@ class AdminOrganizationByID(Resource):
             setattr(organization, attr, request.json[attr])
 
         db.session.commit()
-        return {'message': 'Organization Updated Successfully', 'organization': {
+
+        resp = {'message': 'Organization Updated Successfully', 'organization': {
             'id': organization.id,
             'name': organization.name,
             'email': organization.email,
@@ -328,6 +329,16 @@ class AdminOrganizationByID(Resource):
             'history': organization.history,
             'category': organization.category
         }}, 200
+
+        # Send email notification to admin
+        organization_email = organization.email
+        subject = f" CONGRATULATIONS - ORGANIZATION APPROVED"
+        body = f"Hi {organization.name},\n\nYour organization, {organization.name}, has been approved for crowdfunding on Mazingira. \n\nKindly log in to edit your details."
+        msg = Message(subject, sender=app.config['MAIL_USERNAME'], recipients=[organization_email])
+        msg.body = body
+        mail.send(msg)
+
+        return resp
     
     def delete(self, id):
         print(session)
@@ -592,12 +603,6 @@ class ContactResource(Resource):
         except Exception as e:
             db.session.rollback()
             return {'error': str(e)}, 500
-        
-class AdminNotification(Resource):
-    def get(self):
-        notifications = AdminNotification.query.filter_by(is_read=False).all()
-        notification_list = [{'id': n.id, 'message': n.message, 'date_created': n.date_created} for n in notifications]
-        return jsonify(notification_list)
 
 
 # EndPoints
@@ -619,7 +624,6 @@ api.add_resource(DonorOrganizationByID, '/donor/organization/<int:id>', endpoint
 api.add_resource(Donate, '/donate', endpoint='donate')
 api.add_resource(BeneficiariesStories, '/donor/stories', endpoint='beneficiaries_stories')
 api.add_resource(ContactResource, '/submit_contact_form')
-api.add_resource(AdminNotification, '/admin/notification')
 
 
 
