@@ -173,6 +173,14 @@ class RegisterOrganization(Resource):
                 msg.body = body
                 mail.send(msg)
 
+        # Send email notification to organization
+                organization_email = org.email
+                subject = f" PENDING APPROVAL FOR NEW REGISTRATION - '{org.name}' "
+                body = f"Hi {org.name},\n\nA Welcome to Mazingira. You will be able to use all our features after your account has been approved. \n\n Regards."
+                msg = Message(subject, sender=app.config['MAIL_USERNAME'], recipients=[organization_email])
+                msg.body = body
+                mail.send(msg)
+
                 return make_response(org_dict, 200)
                 # return redirect('/organization')
             else:
