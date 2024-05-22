@@ -4,6 +4,7 @@ from flask import Flask, make_response, jsonify, request, session, redirect
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_restful import Api, Resource,reqparse
+from flask_mail import Mail, Message
 from models import db, Organization , User, Donation, Story, Beneficiary,Contact,AdminNotification
 
 app = Flask(__name__)
@@ -19,6 +20,14 @@ app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
+
+app.config['MAIL_SERVER'] = 'smtp-relay.brevo.com'  # Your email server
+app.config['MAIL_PORT'] = 587  # Port for TLS
+app.config['MAIL_USE_TLS'] = True  # Enable TLS
+app.config['MAIL_USERNAME'] = '7547d2001@smtp-brevo.com'  # Your email username
+app.config['MAIL_PASSWORD'] = 'zqLRaNEk1fh7Ax0D'  # Your email password
+app.config['MAIL_USE_SSL'] = False
+
 app.json.compact = False
 
 app.json.compact = False
@@ -28,6 +37,8 @@ migrate = Migrate(app, db)
 db.init_app(app)
 
 api = Api(app)
+
+mail = Mail(app)
 
 # @app.before_request
 # def check_if_logged_in():
@@ -121,48 +132,10 @@ class RegisterUser(Resource):
             return make_response({'message': 'All fields have to be filled'}, 401)
 
 
-# class RegisterOrganization(Resource):
-
-#     def post(self):
-
-#         data = request.get_json()
-#         if data:
-#             name = request.get_json()['name']
-#             email = request.get_json()['email']
-#             password = request.get_json()['password']
-
-#             new_org = Organization(name=name, email=email)
-#             new_org.set_password(password)
-#             db.session.add(new_org)
-#             db.session.commit()
-
-#             org = Organization.query.filter(Organization.email == email).first()
-
-#             if org and org.authenticate(password) == True:
-#                 session['user_id'] = org.id
-#                 session['user_role'] = org.role
-#                 org_dict = {
-#                 'id': org.id,
-#                 'name': org.name,
-#                 'approval_status': org.approval_status,
-#                 'email': org.email,
-#                 'description': org.description,
-#                 'category': org.category,
-#                 'history': org.history,
-#                 'image_url': org.image_url,
-#                 'registered_on': org.created_at,
-#                 'application_reviewed_on': org.updated_at
-#                 }
-#                 return make_response(org_dict, 200)
-#                 # return redirect('/organization')
-#             else:
-#                 return make_response({'error': 'Invalid username or password'}, 401)
-#         else:
-#             return make_response({'message': 'All fields have to be filled'}, 401)
-
-
 class RegisterOrganization(Resource):
+
     def post(self):
+
         data = request.get_json()
         if data:
             name = request.get_json()['name']
@@ -176,29 +149,32 @@ class RegisterOrganization(Resource):
 
             org = Organization.query.filter(Organization.email == email).first()
 
-            if org and org.authenticate(password):
+            if org and org.authenticate(password) == True:
                 session['user_id'] = org.id
                 session['user_role'] = org.role
                 org_dict = {
-                    'id': org.id,
-                    'name': org.name,
-                    'approval_status': org.approval_status,
-                    'email': org.email,
-                    'description': org.description,
-                    'category': org.category,
-                    'history': org.history,
-                    'image_url': org.image_url,
-                    'registered_on': org.created_at,
-                    'application_reviewed_on': org.updated_at
+                'id': org.id,
+                'name': org.name,
+                'approval_status': org.approval_status,
+                'email': org.email,
+                'description': org.description,
+                'category': org.category,
+                'history': org.history,
+                'image_url': org.image_url,
+                'registered_on': org.created_at,
+                'application_reviewed_on': org.updated_at
                 }
-
-                # Generate notification for admin about pending approval
-                message = f"New organization '{org.name}' has signed up and is pending approval."
-                new_notification = AdminNotification(message=message)
-                db.session.add(new_notification)
-                db.session.commit()
+                
+        # Send email notification to admin
+                admin_email = 'mazingira48@gmail.com'
+                subject = f" PENDING APPROVAL FOR NEW REGISTRATION - '{org.name}' "
+                body = f"Hi Admin,\n\nA new organization '{org.name}' has signed up to Mazingira and is pending approval. \n\nKindly log in to review their approval."
+                msg = Message(subject, sender=app.config['MAIL_USERNAME'], recipients=[admin_email])
+                msg.body = body
+                mail.send(msg)
 
                 return make_response(org_dict, 200)
+                # return redirect('/organization')
             else:
                 return make_response({'error': 'Invalid username or password'}, 401)
         else:
