@@ -12,7 +12,7 @@ app = Flask(__name__)
 app.secret_key = b'Y\xf1Xz\x00\xad|eQ\x80t \xca\x1a\x10K'
 
 # CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
-CORS(app, supports_credentials=True, origins=["http://localhost:3000", "https://mazihttps://mazingira-application.onrender.comngira-application.onrender.com"])
+CORS(app, supports_credentials=True, origins=["http://localhost:3000", "https://mazingira-application.onrender.com"])
 
 app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # or 'Strict' or 'Lax'
 app.config['SESSION_COOKIE_SECURE'] = True
