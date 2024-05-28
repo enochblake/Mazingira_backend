@@ -11,7 +11,10 @@ faker = "*"
 flask-restful = "*"
 werkzeug = "*"
 sqlalchemy-serializer = "*"
-flask-bcrypt = "*"
+flask-cors = "*"
+psycopg2-binary = "*"
+gunicorn = "*"
+flask-mail = "*"
 
 [dev-packages]
 
