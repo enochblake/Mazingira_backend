@@ -1,8 +1,8 @@
-"""New db
+"""empty message
 
-Revision ID: 34259a04f06e
+Revision ID: 8b18d87b398b
 Revises: 
-Create Date: 2024-05-18 10:46:12.629760
+Create Date: 2024-10-07 12:42:34.551171
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '34259a04f06e'
+revision = '8b18d87b398b'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -24,7 +24,7 @@ def upgrade():
     sa.Column('last_name', sa.String(), nullable=False),
     sa.Column('email', sa.String(), nullable=False),
     sa.Column('message', sa.Text(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('organizations',
@@ -36,7 +36,7 @@ def upgrade():
     sa.Column('category', sa.String(), nullable=True),
     sa.Column('description', sa.String(), nullable=True),
     sa.Column('history', sa.String(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.Column('password_hash', sa.String(), nullable=False),
     sa.Column('role', sa.String(), nullable=False),
@@ -58,7 +58,7 @@ def upgrade():
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('recieved_amount', sa.Float(), nullable=False),
     sa.Column('image_url', sa.String(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
     sa.Column('organization_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['organization_id'], ['organizations.id'], name=op.f('fk_beneficiaries_organization_id_organizations')),
     sa.PrimaryKeyConstraint('id')
@@ -67,7 +67,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('amount', sa.Float(), nullable=False),
     sa.Column('anonymous', sa.Boolean(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
     sa.Column('donor_id', sa.Integer(), nullable=True),
     sa.Column('organization_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['donor_id'], ['users.id'], name=op.f('fk_donations_donor_id_users')),
@@ -79,7 +79,7 @@ def upgrade():
     sa.Column('title', sa.String(length=120), nullable=False),
     sa.Column('content', sa.Text(), nullable=False),
     sa.Column('image_url', sa.String(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
     sa.Column('time_to_read', sa.Integer(), nullable=True),
     sa.Column('organization_id', sa.Integer(), nullable=True),
     sa.Column('beneficiary_id', sa.Integer(), nullable=True),

@@ -16,8 +16,8 @@ CORS(app, supports_credentials=True, origins=["http://localhost:3000", "https://
 
 app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # or 'Strict' or 'Lax'
 app.config['SESSION_COOKIE_SECURE'] = True
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mazingira.db'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mazingira.db'
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
 
@@ -502,6 +502,7 @@ class OrganizationDonations(Resource):
             print(session)
             for donation in Donation.query.filter_by(organization_id = session['user_id']):
                 user = User.query.get(donation.donor_id)
+                print(user)
                 donations.append({
                     'id': donation.id,
                     'amount': donation.amount,
