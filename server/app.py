@@ -3,68 +3,58 @@ import os
 from flask import Flask, make_response, jsonify, request, session, redirect
 from flask_cors import CORS
 from flask_migrate import Migrate
-from flask_restful import Api, Resource,reqparse
+from flask_restful import Api, Resource, reqparse
 from flask_mail import Mail, Message
-from models import db, Organization , User, Donation, Story, Beneficiary,Contact
+from models import db, Organization, User, Donation, Story, Beneficiary, Contact
 
+# Initialize Flask app
 app = Flask(__name__)
 
+# Secret key for sessions
 app.secret_key = b'Y\xf1Xz\x00\xad|eQ\x80t \xca\x1a\x10K'
 
-# CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
-CORS(app, supports_credentials=True, origins=["http://localhost:3000", "https://mazingira-application.onrender.com"])
-# postgresql://mazingira_82i9_user:Z5ytsHMJGey0mZGL75tbUVY08iEwVLsa@dpg-cstouv3qf0us73emhffg-a.oregon-postgres.render.com/mazingira_82i9
+# Configure CORS
+CORS(
+    app,
+    supports_credentials=True,
+    origins=["http://localhost:3000", "https://mazingira-application.onrender.com"]
+)
 
-app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # or 'Strict' or 'Lax'
-app.config['SESSION_COOKIE_SECURE'] = True
+# Database configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mazingira.db'
+# Uncomment the following line to use an environment variable for the database URI
 # app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
 
-app.config['MAIL_SERVER'] = 'smtp-relay.brevo.com'  # Your email server
-app.config['MAIL_PORT'] = 587  # Port for TLS
-app.config['MAIL_USE_TLS'] = True  # Enable TLS
-app.config['MAIL_USERNAME'] = '7547d2001@smtp-brevo.com'  # Your email username
-app.config['MAIL_PASSWORD'] = 'zqLRaNEk1fh7Ax0D'  # Your email password
+# Session cookie configuration
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+app.config['SESSION_COOKIE_SECURE'] = True
+
+# Email configuration
+app.config['MAIL_SERVER'] = 'smtp-relay.brevo.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = '7547d2001@smtp-brevo.com'
+app.config['MAIL_PASSWORD'] = 'zqLRaNEk1fh7Ax0D'
 app.config['MAIL_USE_SSL'] = False
 
+# JSON settings
 app.json.compact = False
 
-app.json.compact = False
-
+# Initialize extensions
 migrate = Migrate(app, db)
-
 db.init_app(app)
-
 api = Api(app)
-
 mail = Mail(app)
-
-# @app.before_request
-# def check_if_logged_in():
-#     allowed_admin_endpoints = ['logout','admin_organizations', 'admin_organizations_by_id', 'checksession' ]
-#     allowed_donor_endpoints = ['logout','donor_organizations', 'donor_organization_by_id', 'donate', 'beneficiaries_stories', 'checksession']
-#     allowed_organization_endpoints = ['logout','organization_dashboard', 'set_up_organization_details', 'non_anonymous_donations', 'create_post', 'create_beneficiary', 'checksession']
-
-#     if session.get('user_id'):
-#         if session.get('user_role') == 'donor':
-#             if request.endpoint not in allowed_donor_endpoints:
-#                 return {'error': 'Unauthorized To Access This Resource'}, 401
-#         elif session.get('user_role') == 'admin':
-#             if request.endpoint not in allowed_admin_endpoints:
-#                 return {'error': 'Unauthorized To Access This Resource'}, 401
-#         # elif session.get('user_role') == 'org':
-#         else:
-#             if request.endpoint not in allowed_organization_endpoints:
-#                 return {'error': 'Unauthorized To Access This Resource'}, 401
-#     else:
-#         if request.endpoint not in ['checksession','organization_login', 'login', 'home', 'register_user', 'register_organization']:
-#             return {'error': 'Unauthorized Log In First'}, 401
 
 @app.route('/')
 def index():
+    """Default route."""
     return '<h1>Welcome To Mazingira</h1>'
+
+# Add additional routes or API resources as needed
+
 
 # AUTHENTICATION
 
