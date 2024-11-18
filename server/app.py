@@ -17,7 +17,7 @@ app.secret_key = b'Y\xf1Xz\x00\xad|eQ\x80t \xca\x1a\x10K'
 CORS(
     app,
     supports_credentials=True,
-    origins=["http://localhost:3000", "https://mazingira-backend-1.onrender.com/"]
+    origins=["http://localhost:3000", "https://mazingira-application.onrender.com"]
 )
 
 # Database configuration
@@ -96,7 +96,7 @@ class RegisterUser(Resource):
             last_name = request.get_json()['last_name']
             email = request.get_json()['email']
             password = request.get_json()['password']
-
+            print(data)
             new_user = User(first_name=first_name, last_name=last_name, email=email)
             new_user.set_password(password)
             db.session.add(new_user)
@@ -114,6 +114,7 @@ class RegisterUser(Resource):
                 'email': user.email,
                 'role': user.role,
                 }
+                print(user_dict)
                 return make_response(user_dict, 200)
             
             resp = {'message': f'Congratulations {first_name} {last_name}! Successfully Registered'}
