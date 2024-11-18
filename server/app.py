@@ -17,7 +17,7 @@ app.secret_key = b'Y\xf1Xz\x00\xad|eQ\x80t \xca\x1a\x10K'
 CORS(
     app,
     supports_credentials=True,
-    origins=["http://localhost:3000", "https://mazingira-application.onrender.com"]
+    origins=["http://localhost:3000", "https://mazingira-backend-1.onrender.com/"]
 )
 
 # Database configuration
