@@ -14,11 +14,7 @@ app = Flask(__name__)
 app.secret_key = b'Y\xf1Xz\x00\xad|eQ\x80t \xca\x1a\x10K'
 
 # Configure CORS
-CORS(
-    app,
-    supports_credentials=True,
-    origins=["http://localhost:3000", "https://mazingira-application.onrender.com"]
-)
+CORS(app, resources={r"/*": {"origins": "https://mazingira-seven.vercel.app"}})
 
 # Database configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mazingira.db'
