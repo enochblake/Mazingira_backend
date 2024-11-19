@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, make_response, jsonify, request, session, redirect
+from flask import Flask, make_response, jsonify, request, session, redirect, Response
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_restful import Api, Resource, reqparse
@@ -19,6 +19,11 @@ CORS(
     supports_credentials=True,
     origins=["http://localhost:3000", "https://mazingira-seven.vercel.app/"]
 )
+
+@app.before_request
+def basic_authentication():
+    if request.method.lower() == "options":
+        return Response()
 
 # Database configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mazingira.db'
