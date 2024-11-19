@@ -10,20 +10,22 @@ from models import db, Organization, User, Donation, Story, Beneficiary, Contact
 # Initialize Flask app
 app = Flask(__name__)
 
-# Secret key for sessions
-app.secret_key = b'Y\xf1Xz\x00\xad|eQ\x80t \xca\x1a\x10K'
-
 # Configure CORS
 CORS(
     app,
     supports_credentials=True,
-    origins=["http://localhost:3000", "https://mazingira-seven.vercel.app/"]
+    origins=["http://localhost:3000", "https://mazingira-seven.vercel.app"]
 )
 
 @app.before_request
 def basic_authentication():
     if request.method.lower() == "options":
-        return Response()
+        return Response("", status=200)
+
+# Secret key for sessions
+app.secret_key = b'Y\xf1Xz\x00\xad|eQ\x80t \xca\x1a\x10K'
+
+
 
 # Database configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mazingira.db'
